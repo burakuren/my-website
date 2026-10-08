@@ -2,7 +2,8 @@
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ManLine from '../components/ManLine.astro';
-import Portrait from '../components/Portrait.astro';
+import { getImage, Image } from 'astro:assets';
+import photo from '../assets/burak.jpg';
 import SectionHead from '../components/SectionHead.astro';
 import { monthLabel, shortHash } from '../lib/format';
 import { SITE_URL } from '../site.config.mjs';
@@ -12,6 +13,8 @@ const skills = (await getEntry('skills', 'skills'))!.data;
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).map((p) => p.data);
 const experience = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order).map((e) => e.data);
 
+// Square JPEG of the photo for structured data (search engines want a stable, crawlable URL).
+const photoLd = await getImage({ src: photo, width: 400, height: 400, format: 'jpg', quality: 85 });
 const mailto = `mailto:${profile.email}`;
 const cvFileName = `${profile.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_')}_CV.pdf`;
 const keyWidth = Math.max(...skills.groups.flatMap((g) => g.items.map((i) => i.key.length)));
@@ -23,7 +26,7 @@ const person = {
   name: profile.name,
   alternateName: 'Burak Uren',
   url: `${SITE_URL}/`,
-  image: `${SITE_URL}/og.png`,
+  image: new URL(photoLd.src, SITE_URL).href,
   jobTitle: profile.role,
   description: profile.seoDescription,
   email: `mailto:${profile.email}`,
@@ -95,7 +98,10 @@ const jsonLd = [
         <div class="term-body">
           <div><span class="c-blue">~</span> <span class="c-green">❯</span> fetch</div>
           <div class="term-fetch">
-            <Portrait />
+            <figure class="photo">
+              <Image src={photo} alt={`Photo of ${profile.name}`} width={152} height={152} densities={[1, 2]} loading="eager" fetchpriority="high" />
+              <figcaption>~/burak.jpg</figcaption>
+            </figure>
             <div class="fetch-info">
               <dl class="kv">
                 <dt class="c-green bold">burak</dt>

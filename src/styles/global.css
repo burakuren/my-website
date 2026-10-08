@@ -555,6 +555,29 @@ a.tag:hover {
   margin: 10px 0 16px;
 }
 
+/* ~/burak.jpg in the fetch card */
+.photo {
+  margin: 0;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.photo img {
+  display: block;
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--panel);
+}
+.photo figcaption {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
 /* Drawn at 12px and zoomed down, so it reads as an image rather than as
    tiny body text to legibility audits. Visual size: 6px. */
 .portrait {
