@@ -10,7 +10,7 @@ Personal site of Burak Üren: a static [Astro](https://astro.build) build, conte
 | Sveltia CMS | Git-based editor at `/admin/`; every save is a commit to `main` |
 | `sveltia-cms-auth` Worker | GitHub OAuth for the CMS (deployed separately) |
 | Cloudflare Workers static assets | Serves `dist/` at `burakuren.com`, with headers from `public/_headers` |
-| `burakuren-com-www-redirect` Worker | 301s `www.burakuren.com/*` to the apex domain |
+| Cloudflare Redirect Rule | 301s `www.burakuren.com/*` to the apex domain (zone rule, no code) |
 | Workers Builds | Cloudflare's Git integration: on push to `main`, type-check, build, `wrangler deploy` |
 
 ## Where the content lives
@@ -63,8 +63,7 @@ Pushes to `main` deploy through [Workers Builds](https://developers.cloudflare.c
 Manual deploys:
 
 ```sh
-npm run deploy       # site → burakuren.com
-npm run deploy:www   # www → apex redirect (rarely changes)
+npm run deploy   # site → burakuren.com
 ```
 
 ### CMS sign-in

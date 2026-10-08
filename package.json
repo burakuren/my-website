@@ -12,8 +12,7 @@
     "preview": "npm run build && wrangler dev",
     "check": "astro check",
     "deploy": "npm run build && wrangler deploy",
-    "images": "node --experimental-strip-types scripts/generate-images.mjs",
-    "deploy:www": "wrangler deploy --config workers/www-redirect/wrangler.jsonc"
+    "images": "node --experimental-strip-types scripts/generate-images.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

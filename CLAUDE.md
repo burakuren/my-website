@@ -11,7 +11,6 @@ npm run build      # static build into dist/
 npm run preview    # build + wrangler dev on :8787 (real _headers/_redirects)
 npm run images     # regenerate public/og.png + icons from profile.yml and src/assets/burak.jpg
 npm run deploy     # manual site deploy (normally CI does it)
-npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 ```
 
 `astro dev` daemonizes in Astro 7; stop it with `npx astro dev stop`. `wrangler dev` hot-reloads `dist/` and can serve a stale/half-written build if you rebuild while it runs; restart it after `npm run build`.
@@ -55,9 +54,9 @@ Canonical + OG/Twitter tags + JSON-LD in `src/layouts/Base.astro`; ProfilePage/P
 
 ## Cloudflare / deployment
 
-- Account `661b818927961aa2609e3860dab9f598`. Worker `burakuren-com` is assets-only (`wrangler.jsonc`) on the **custom domain** `burakuren.com` (apex is canonical). `www.burakuren.com` is a separate Worker (`workers/www-redirect`) that 301s to the apex.
+- Account `661b818927961aa2609e3860dab9f598`. Worker `burakuren-com` is assets-only (`wrangler.jsonc`) on the **custom domain** `burakuren.com` (apex is canonical). `www.burakuren.com` 301s to the apex via a zone **Single Redirect rule** (Rules > Redirect Rules: hostname `www.burakuren.com` → `concat("https://burakuren.com", http.request.uri.path)`, query string preserved) on a proxied placeholder record `www AAAA 100::`. Dashboard-managed, not in the repo; don't reintroduce a Worker for it.
 - CI is **Workers Builds** (connected in the dashboard): every push to `main`, including every Sveltia CMS save, runs `npm run check && npm run build` then `npx wrangler deploy`. Live roughly 60-70s after a push. Node version from `.node-version`.
-- Use Wrangler for anything you execute (deploys, config changes). Dashboard-only setup (DNS, zone settings, Git connection) is fine to ask the user to do. The local wrangler OAuth token cannot read or edit DNS.
+- Pick the best-practice Cloudflare feature first, even if it is dashboard-only; the user does dashboard steps (DNS, zone settings, rules, Git connection). Use Wrangler for anything you execute yourself. The local wrangler OAuth token cannot read or edit DNS.
 - CMS auth: `public/admin/config.yml` → `base_url: https://sveltia-cms-auth.burakuren101.workers.dev`. That Worker is **shared with another project (irem-ak-website)** and has no local source. Its `ALLOWED_DOMAINS` must keep the irem entries. To change it, download the deployed bundle via the Cloudflare API (`/workers/scripts/sveltia-cms-auth/content/v2`) and redeploy it unchanged with `wrangler deploy --no-bundle` and updated `vars`; the `GITHUB_CLIENT_SECRET` secret persists across deploys.
 - DNS on `burakuren.com` also carries Tutanota mail: MX, SPF + verification TXT, `_dmarc` (p=quarantine), DKIM CNAMEs `s1/s2._domainkey` (must stay **DNS-only**, not proxied), and `mta-sts` / `_mta-sts` CNAMEs. Never touch these when changing web records.
 
