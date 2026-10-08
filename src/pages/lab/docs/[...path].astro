@@ -1,0 +1,53 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import LabLayout from '../../../components/LabLayout.astro';
+import { docUrl, type LabDoc } from '../../../lib/lab';
+
+export const getStaticPaths = (async () => (await getCollection('labDocs')).map((doc) => ({ params: { path: doc.id }, props: { doc } }))) satisfies GetStaticPaths;
+
+const { doc } = Astro.props as { doc: LabDoc };
+const { Content } = await render(doc);
+
+// Build a folder tree from the entry ids ("infra/dns/mail-records").
+type Node = { dirs: Map<string, Node>; docs: LabDoc[] };
+const root: Node = { dirs: new Map(), docs: [] };
+for (const d of await getCollection('labDocs')) {
+  const parts = d.id.split('/').slice(0, -1);
+  let node = root;
+  for (const p of parts) {
+    if (!node.dirs.has(p)) node.dirs.set(p, { dirs: new Map(), docs: [] });
+    node = node.dirs.get(p)!;
+  }
+  node.docs.push(d);
+}
+const sortDocs = (docs: LabDoc[]) => docs.sort((a, b) => a.data.weight - b.data.weight || a.data.title.localeCompare(b.data.title));
+const current = docUrl(doc);
+---
+
+<LabLayout title={doc.data.title} description={doc.data.title} cwd={`~/lab/docs/${doc.id}`}>
+  <div class="lab-split">
+    <nav aria-label="Docs tree">
+      <p class="muted mono">$ tree docs/</p>
+      {
+        (function renderNode(node: Node): any {
+          return (
+            <ul class="lab-tree">
+              {sortDocs(node.docs).map((d) => (
+                <li><a href={docUrl(d)} {...(docUrl(d) === current ? { 'aria-current': 'page' } : {})}>{d.id.split('/').at(-1)}.md</a></li>
+              ))}
+              {[...node.dirs].map(([name, child]) => (
+                <li><span class="c-blue">{name}/</span>{renderNode(child)}</li>
+              ))}
+            </ul>
+          );
+        })(root)
+      }
+    </nav>
+    <article>
+      <p class="muted mono">docs/{doc.id}.md</p>
+      <h1>{doc.data.title}</h1>
+      <div class="prose"><Content /></div>
+    </article>
+  </div>
+</LabLayout>

@@ -1,0 +1,71 @@
+---
+import { getEntries, getEntry } from 'astro:content';
+import { Code } from 'astro:components';
+import LabLayout from '../../components/LabLayout.astro';
+import { markdownToHtml } from 'satteri';
+import { noteUrl } from '../../lib/lab';
+
+// Rich text fields are stored as Markdown; render with Astro's own engine.
+const md = (text: string) => markdownToHtml(text).html;
+
+const w = (await getEntry('labWidgets', 'widgets'))!.data;
+const favourite = w.favourite_note && (await getEntry(w.favourite_note));
+const related = await getEntries(w.related_notes);
+const point = w.location ? (JSON.parse(w.location) as { coordinates: [number, number] }).coordinates : undefined;
+const osm = point && `https://www.openstreetmap.org/?mlat=${point[1]}&mlon=${point[0]}#map=12/${point[1]}/${point[0]}`;
+---
+
+<LabLayout title="Widgets" description="A Sveltia CMS singleton that uses every field type." cwd="~/lab/widgets">
+  <header>
+    <h1 id={w.slug}>{w.title}</h1>
+    <p class="lede">{w.summary} Edit it under <em>Lab: every field type</em> in the CMS.</p>
+  </header>
+
+  <table class="lab-table">
+    <thead><tr><th>FIELD TYPE</th><th>RENDERED</th></tr></thead>
+    <tbody>
+      <tr><th>uuid</th><td><code>{w.uuid}</code></td></tr>
+      <tr><th>string</th><td>{w.title}</td></tr>
+      <tr><th>string + pattern</th><td><code>{w.slug}</code></td></tr>
+      <tr><th>compute</th><td><code>{w.permalink}</code></td></tr>
+      <tr><th>text</th><td>{w.summary}</td></tr>
+      <tr><th>number (int)</th><td>{w.count} items</td></tr>
+      <tr><th>number (float)</th><td>€{w.price?.toFixed(2)}</td></tr>
+      <tr><th>boolean</th><td class={w.enabled ? 'c-green' : 'c-amber'}>{w.enabled ? 'enabled' : 'disabled'}</td></tr>
+      <tr><th>datetime</th><td><code>{w.released}</code></td></tr>
+      <tr><th>datetime (date)</th><td><code>{w.day}</code></td></tr>
+      <tr><th>select</th><td>{w.level}</td></tr>
+      <tr><th>select (multiple)</th><td><ul class="tag-list">{w.platforms.map((p) => <li class="tag">{p}</li>)}</ul></td></tr>
+      <tr><th>relation (filtered)</th><td>{favourite ? <a href={noteUrl(favourite)}>{favourite.data.title}</a> : '-'}</td></tr>
+      <tr><th>relation (multiple)</th><td>{related.map((n, i) => <>{i > 0 && ', '}<a href={noteUrl(n)}>{n.data.title}</a></>)}</td></tr>
+      <tr><th>color (alpha)</th><td style={w.accent && `--accent: ${w.accent}`}><span class="dot" /><code>{w.accent}</code></td></tr>
+      <tr><th>map</th><td>{point ? <a href={osm} rel="noopener">{point[1]}, {point[0]}</a> : '-'} <pre class="muted">{w.location}</pre></td></tr>
+      <tr><th>code</th><td>{w.snippet && <Code code={w.snippet.code} lang={(w.snippet.lang ?? 'text') as any} theme="css-variables" />}</td></tr>
+      <tr><th>keyvalue</th><td><pre>{Object.entries(w.env).map(([k, v]) => `${k}=${v}`).join('\n')}</pre></td></tr>
+      <tr><th>image</th><td>{w.image && <img src={w.image} alt="" width="240" loading="lazy" />}</td></tr>
+      <tr><th>file</th><td>{w.attachment && <a href={w.attachment}>{w.attachment}</a>}</td></tr>
+      <tr><th>list (simple)</th><td>{w.links.map((l) => <div><a href={l} rel="noopener">{l}</a></div>)}</td></tr>
+      <tr><th>object</th><td>{w.author && <>{w.author.name} <span class="muted">({w.author.role})</span></>}</td></tr>
+      <tr><th>richtext</th><td class="prose">{w.markdown && <Fragment set:html={md(w.markdown)} />}</td></tr>
+      <tr><th>hidden</th><td><code>schema_version: {w.schema_version}</code></td></tr>
+    </tbody>
+  </table>
+
+  <section aria-labelledby="blocks"><h2 id="blocks">$ render blocks <span class="muted">(list with types)</span></h2></section>
+  <div class="prose">
+    {
+      w.blocks.map((b) => {
+        switch (b.type) {
+          case 'heading':
+            return <h3>{b.text}</h3>;
+          case 'paragraph':
+            return <Fragment set:html={md(b.text)} />;
+          case 'callout':
+            return <p class="lab-callout" data-kind={b.kind}><strong>{b.kind}:</strong> {b.text}</p>;
+          case 'link':
+            return <p><a href={b.url} rel="noopener">{b.label} →</a></p>;
+        }
+      })
+    }
+  </div>
+</LabLayout>

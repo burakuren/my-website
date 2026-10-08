@@ -55,7 +55,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/admin/') && (hasPublishedPosts || !page.endsWith('/blog/')),
+      filter: (page) => !page.includes('/admin/') && !page.includes('/lab/') && (hasPublishedPosts || !page.endsWith('/blog/')),
     }),
   ],
   fonts: [

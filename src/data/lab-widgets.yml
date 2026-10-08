@@ -1,0 +1,49 @@
+uuid: 3f2b8c1e-9d4a-4f6b-8e2a-7c5d1b0a9e44
+title: Every field type
+slug: every-field-type
+permalink: /lab/widgets/#every-field-type
+summary: A singleton that exercises each Sveltia field type once.
+count: 42
+price: 9.99
+enabled: true
+released: 2026-10-08T09:30
+day: 2026-10-08
+level: intermediate
+platforms: [linux, macos]
+favourite_note: wrangler-tail
+related_notes: [django-select-related, systemd-analyze]
+accent: '#e2b466cc'
+location: '{"type":"Point","coordinates":[28.9784,41.0082]}'
+snippet:
+  code: |-
+    def greet(name: str) -> str:
+        return f"hello, {name}"
+  lang: python
+env:
+  NODE_ENV: production
+  LOG_LEVEL: info
+image: /og.png
+attachment: /favicon.svg
+links:
+  - https://burakuren.com
+  - https://sveltiacms.app
+author:
+  name: Burak Üren
+  role: Backend engineer
+markdown: |-
+  Some **Markdown** with a [link](https://burakuren.com) and `code`.
+
+  - one
+  - two
+schema_version: 1
+blocks:
+  - type: heading
+    text: Page builder
+  - type: paragraph
+    text: A list field with **types** lets an editor stack different blocks in any order.
+  - type: callout
+    kind: tip
+    text: Each block type has its own fields.
+  - type: link
+    label: Read the docs
+    url: https://sveltiacms.app/en/docs/fields/list

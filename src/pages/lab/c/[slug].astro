@@ -1,0 +1,20 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LabLayout from '../../../components/LabLayout.astro';
+import LabNoteList from '../../../components/LabNoteList.astro';
+import { getCategories, getNotes, type LabCategory } from '../../../lib/lab';
+
+export const getStaticPaths = (async () => (await getCategories()).map((category) => ({ params: { slug: category.id }, props: { category } }))) satisfies GetStaticPaths;
+
+const { category } = Astro.props as { category: LabCategory };
+const categories = await getCategories();
+const notes = await getNotes((n) => n.data.category.id === category.id);
+---
+
+<LabLayout title={category.data.name} description={category.data.description ?? category.data.name} cwd={`~/lab/c/${category.id}`}>
+  <header style={`--accent: ${category.data.color}`}>
+    <h1><span class="dot" />{category.data.name}</h1>
+    <p class="lede">{category.data.description}</p>
+  </header>
+  <LabNoteList notes={notes} categories={categories} />
+</LabLayout>

@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { parse as parseYaml } from 'yaml';
@@ -103,4 +103,83 @@ const skills = defineCollection({
   }),
 });
 
-export const collections = { blog, profile, projects, experience, skills };
+/*
+ * Lab: throwaway collections that exercise Sveltia CMS features
+ * (relations, nested folders, i18n, every field type). Rendered under /lab/.
+ */
+const labCategories = defineCollection({
+  loader: glob({ pattern: '*.yml', base: './src/content/lab/categories' }),
+  schema: z.object({
+    name: z.string(),
+    description: z.string().optional(),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/),
+    order: z.number().default(0),
+  }),
+});
+
+const labNotes = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/lab/notes' }),
+  schema: z.object({
+    title: z.string(),
+    kind: z.enum(['til', 'snippet', 'link']),
+    category: reference('labCategories'),
+    tags: z.array(z.string()).default([]),
+    date: z.coerce.date(),
+    url: z.url().optional(),
+    rating: z.number().int().min(1).max(5).optional(),
+    pinned: z.boolean().default(false),
+  }),
+});
+
+const labDocs = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/lab/docs' }),
+  schema: z.object({ title: z.string(), weight: z.number().default(0) }),
+});
+
+const glossaryLocale = z.object({ term: z.string(), definition: z.string(), category: reference('labCategories').optional() });
+const labGlossary = defineCollection({
+  loader: glob({ pattern: '*.yml', base: './src/content/lab/glossary' }),
+  schema: z.object({ en: glossaryLocale, tr: glossaryLocale.partial().optional() }),
+});
+
+const labWidgets = defineCollection({
+  loader: singleton('src/data/lab-widgets.yml', 'widgets'),
+  schema: z.object({
+    uuid: z.string().optional(),
+    title: z.string(),
+    slug: z.string(),
+    permalink: z.string().optional(),
+    summary: z.string().optional(),
+    count: z.number().optional(),
+    price: z.number().optional(),
+    enabled: z.boolean().default(false),
+    released: z.string().optional(),
+    day: z.coerce.string().optional(),
+    level: z.string().optional(),
+    platforms: z.array(z.string()).default([]),
+    favourite_note: reference('labNotes').optional(),
+    related_notes: z.array(reference('labNotes')).default([]),
+    accent: z.string().optional(),
+    location: z.string().optional(),
+    snippet: z.object({ code: z.string(), lang: z.string().optional() }).optional(),
+    env: z.record(z.string(), z.string()).default({}),
+    image: z.string().optional(),
+    attachment: z.string().optional(),
+    links: z.array(z.string()).default([]),
+    author: z.object({ name: z.string(), role: z.string().optional() }).optional(),
+    markdown: z.string().optional(),
+    schema_version: z.number().optional(),
+    blocks: z
+      .array(
+        z.discriminatedUnion('type', [
+          z.object({ type: z.literal('heading'), text: z.string() }),
+          z.object({ type: z.literal('paragraph'), text: z.string() }),
+          z.object({ type: z.literal('callout'), kind: z.enum(['note', 'tip', 'warning']).default('note'), text: z.string() }),
+          z.object({ type: z.literal('link'), label: z.string(), url: z.url() }),
+        ]),
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { blog, profile, projects, experience, skills, labCategories, labNotes, labDocs, labGlossary, labWidgets };

@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getEntry, render } from 'astro:content';
+import LabLayout from '../../../components/LabLayout.astro';
+import { isoDate } from '../../../lib/format';
+import { categoryUrl, getNotes, stars, type LabNote } from '../../../lib/lab';
+
+export const getStaticPaths = (async () => (await getNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }))) satisfies GetStaticPaths;
+
+const { note } = Astro.props as { note: LabNote };
+const { Content } = await render(note);
+// Resolves the Relation field (stored as the category slug) to the entry.
+const category = await getEntry(note.data.category);
+---
+
+<LabLayout title={note.data.title} description={note.data.title} cwd={`~/lab/notes/${note.id}`}>
+  <header style={category && `--accent: ${category.data.color}`}>
+    <p class="muted mono">
+      {isoDate(note.data.date)} · <span class="c-amber">{note.data.kind}</span> ·
+      {category && <a href={categoryUrl(category.id)}><span class="dot" />{category.data.name}</a>}
+      {note.data.rating && <> · <span class="c-amber">{stars(note.data.rating)}</span></>}
+    </p>
+    <h1>{note.data.title}</h1>
+    {note.data.url && <p><a href={note.data.url} rel="noopener">{note.data.url}</a></p>}
+  </header>
+  <div class="prose"><Content /></div>
+  {note.data.tags.length > 0 && <ul class="tag-list">{note.data.tags.map((t) => <li class="tag">{t}</li>)}</ul>}
+</LabLayout>
