@@ -27,3 +27,6 @@ npm-debug.log*
 # design export and source CV (kept out of the repo)
 design/
 CV/
+
+# local hardening follow-ups (lists open gaps; repo is public)
+TODO.md
