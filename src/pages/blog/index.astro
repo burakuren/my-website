@@ -21,7 +21,7 @@ for (const p of posts) {
   else groups.push({ year, posts: [p] });
 }
 
-const title = `Blog — ${profile.name}`;
+const title = `Blog | ${profile.name}`;
 const description = 'Notes from building and running systems: backend, infrastructure and Linux. What worked, what broke, and why.';
 
 const jsonLd = [
@@ -52,7 +52,7 @@ const jsonLd = [
       <div class="page-intro-copy">
         <p class="label" aria-hidden="true">NAME</p>
         <h1 class="page-title indent" id="blog-title">Writing</h1>
-        <p class="page-lede indent">Notes from building and running systems — backend, infrastructure and Linux. What worked, what broke, and why.</p>
+        <p class="page-lede indent">Notes from building and running systems: backend, infrastructure and Linux. What worked, what broke, and why.</p>
       </div>
       <a class="rss-link" href="/rss.xml"><span class="c-amber">rss</span><span class="muted">/rss.xml</span></a>
     </section>
@@ -84,7 +84,7 @@ const jsonLd = [
     {
       posts.length === 0 ? (
         <div class="empty">
-          <p><span class="muted">ls:</span> no posts yet — the first one is being written.</p>
+          <p><span class="muted">ls:</span> no posts yet; the first one is being written.</p>
           <p class="muted">Subscribe to <a href="/rss.xml" class="c-green">rss.xml</a> to get it when it lands.</p>
         </div>
       ) : (

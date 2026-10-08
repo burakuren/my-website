@@ -69,7 +69,7 @@ const jsonLd = [
 ---
 
 <Base
-  title={`${title} — ${profile.name}`}
+  title={`${title} | ${profile.name}`}
   description={description}
   section="blog"
   cwd="~/blog"
@@ -92,7 +92,7 @@ const jsonLd = [
         <time datetime={pubDate.toISOString()}>{isoDate(pubDate)}</time><span aria-hidden="true">·</span><span>{minutes} min read</span>
         {tags.length > 0 && <span aria-hidden="true">·</span>}
         {tags.map((t) => <a class="tag" href={`/blog/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
-        {post.data.draft && <span class="c-amber">(draft — not published)</span>}
+        {post.data.draft && <span class="c-amber">(draft, not published)</span>}
       </div>
       <h1 id="post-title">{title}</h1>
       <p class="lede">{description}</p>
@@ -139,7 +139,7 @@ const jsonLd = [
           <div class="author-copy">
             <div class="author-cmd" aria-hidden="true">$ whoami</div>
             <p class="author-name">{profile.name}</p>
-            <p>{profile.role} — backend, devops, Linux. I write here about things I've built, broken and fixed.</p>
+            <p>{profile.role} working across backend, devops and Linux. I write here about things I've built, broken and fixed.</p>
             <div class="author-links">
               <a href="/#about">~/about</a>
               <a href="/rss.xml">rss.xml</a>
@@ -171,7 +171,7 @@ const jsonLd = [
             ) : (
               <div class="none next">
                 <small>newer →</small>
-                <strong>You're at HEAD — this is the latest post.</strong>
+                <strong>You're at HEAD: this is the latest post.</strong>
               </div>
             )
           }

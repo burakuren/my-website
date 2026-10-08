@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/** 2026-09-14 — ISO calendar date in UTC, as shown throughout the site. */
+/** 2026-09-14: ISO calendar date in UTC, as shown throughout the site. */
 export function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }

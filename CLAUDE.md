@@ -20,7 +20,7 @@ npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 
 - Design lives in Claude Design exports under `design/` (gitignored, local only). They are self-extracting bundles; read them with `python3 -I scripts/unpack-design.py "design/<file>.html" <out-dir>`. Each board becomes a folder; markup uses `{{c.*}}` placeholders and the colours/data/embedded images are in the board's `text/x-dc` script.
 - Visual language: Linux terminal + man pages + git (`UREN(1)` running headers, `$ cat about.md` section commands, `ls -l` projects, `git log` experience, `.conf` skills, `~ ❯` prompts). Keep new UI and copy in that voice.
-- Theme tokens are CSS custom properties in `src/styles/global.css` (dark default, light via `[data-theme]` or OS preference). Colours must come from tokens, not literals.
+- Theme tokens are CSS custom properties in `src/styles/global.css`. Dark is the default regardless of OS preference; light only via the toggle (`[data-theme]`, stored in localStorage). Colours must come from tokens, not literals.
 - The user's real photo (`src/assets/burak.jpg`, rendered via `src/components/Avatar.astro` as AVIF/WebP/JPEG) replaced the design's ASCII portrait everywhere. Don't reintroduce ASCII art for him.
 
 ## Content model
@@ -38,6 +38,7 @@ npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 - Markdown pipeline (Astro 7 Sätteri processor): Shiki with the `css-variables` theme mapped to site tokens; `src/lib/shiki-code-header.mjs` wraps code blocks (fence meta `title="..."`, copy button revealed by JS); `satteri-callouts` for `> [!NOTE]`; `src/lib/satteri-figure.mjs` turns `![alt](img "caption")` into figure/figcaption.
 - The CV is `public/cv.pdf` (contains a phone number). `_headers` forces download as `Burak_Uren_CV.pdf` with `X-Robots-Tag: noindex`; `/resume.pdf` 301s to it. The source CV lives in `CV/` (gitignored).
 - Site copy is English only.
+- No em dashes (—) or en dashes (–) anywhere in site copy, titles, meta or CMS hints. Use a plain hyphen, colon, semicolon, comma or `|` (page titles: `Page | Burak Üren`).
 
 ## Astro 7 gotchas hit in this project
 
@@ -49,12 +50,12 @@ npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 
 ## SEO checklist (keep intact)
 
-Canonical + OG/Twitter tags + JSON-LD in `src/layouts/Base.astro`; ProfilePage/Person/WebSite on home, Blog on `/blog/`, BlogPosting + BreadcrumbList on posts; sitemap (`@astrojs/sitemap`, `/admin/` excluded), `robots.txt` (`src/pages/robots.txt.ts`), RSS (`src/pages/rss.xml.ts`), `trailingSlash: 'always'`, self-hosted fonts via the Astro Fonts API. Last Lighthouse run: 99–100 across categories, CLS 0.
+Canonical + OG/Twitter tags + JSON-LD in `src/layouts/Base.astro`; ProfilePage/Person/WebSite on home, Blog on `/blog/`, BlogPosting + BreadcrumbList on posts; sitemap (`@astrojs/sitemap`, `/admin/` excluded), `robots.txt` (`src/pages/robots.txt.ts`), RSS (`src/pages/rss.xml.ts`), `trailingSlash: 'always'`, self-hosted fonts via the Astro Fonts API. Last Lighthouse run: 99-100 across categories, CLS 0.
 
 ## Cloudflare / deployment
 
 - Account `661b818927961aa2609e3860dab9f598`. Worker `burakuren-com` is assets-only (`wrangler.jsonc`) on the **custom domain** `burakuren.com` (apex is canonical). `www.burakuren.com` is a separate Worker (`workers/www-redirect`) that 301s to the apex.
-- CI is **Workers Builds** (connected in the dashboard): every push to `main`, including every Sveltia CMS save, runs `npm run check && npm run build` then `npx wrangler deploy`. Live roughly 60–70s after a push. Node version from `.node-version`.
+- CI is **Workers Builds** (connected in the dashboard): every push to `main`, including every Sveltia CMS save, runs `npm run check && npm run build` then `npx wrangler deploy`. Live roughly 60-70s after a push. Node version from `.node-version`.
 - Use Wrangler for anything you execute (deploys, config changes). Dashboard-only setup (DNS, zone settings, Git connection) is fine to ask the user to do. The local wrangler OAuth token cannot read or edit DNS.
 - CMS auth: `public/admin/config.yml` → `base_url: https://sveltia-cms-auth.burakuren101.workers.dev`. That Worker is **shared with another project (irem-ak-website)** and has no local source. Its `ALLOWED_DOMAINS` must keep the irem entries. To change it, download the deployed bundle via the Cloudflare API (`/workers/scripts/sveltia-cms-auth/content/v2`) and redeploy it unchanged with `wrangler deploy --no-bundle` and updated `vars`; the `GITHUB_CLIENT_SECRET` secret persists across deploys.
 - DNS on `burakuren.com` also carries Tutanota mail: MX, SPF + verification TXT, `_dmarc` (p=quarantine), DKIM CNAMEs `s1/s2._domainkey` (must stay **DNS-only**, not proxied), and `mta-sts` / `_mta-sts` CNAMEs. Never touch these when changing web records.

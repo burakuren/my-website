@@ -1,6 +1,6 @@
 ---
 title: Zero-downtime deploys with systemd socket activation
-description: Keep connections queued in the kernel while your service restarts — no load balancer required.
+description: Keep connections queued in the kernel while your service restarts, no load balancer required.
 pubDate: 2026-09-14
 tags:
   - linux
@@ -21,7 +21,7 @@ systemd opens the listening socket itself, then hands it to your service as an i
 1. systemd creates and binds the socket from a `.socket` unit.
 2. On the first connection, it starts the matching `.service`.
 3. The service receives the socket as file descriptor 3, with `LISTEN_FDS=1` set.
-4. On restart, only the process changes — the socket stays put.
+4. On restart, only the process changes; the socket stays put.
 
 ## The unit files
 
@@ -50,11 +50,11 @@ sudo systemctl restart api.service     # socket stays open
 ```
 
 > [!NOTE]
-> The service unit doesn't need its own `[Install]` section — the socket starts it on demand.
+> The service unit doesn't need its own `[Install]` section: the socket starts it on demand.
 
 ## Teaching the app to accept the socket
 
-Your app has to use the inherited socket instead of opening its own. Most ecosystems have a small helper — `sd_listen_fds()` in C, go-systemd's activation package in Go — or you can read `LISTEN_FDS` yourself and wrap fd 3.
+Your app has to use the inherited socket instead of opening its own. Most ecosystems have a small helper (`sd_listen_fds()` in C, go-systemd's activation package in Go), or you can read `LISTEN_FDS` yourself and wrap fd 3.
 
 ## Trade-offs
 

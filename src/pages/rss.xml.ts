@@ -7,7 +7,7 @@ export async function GET(context: APIContext) {
   const profile = (await getEntry('profile', 'profile'))!.data;
   const posts = (await getPosts()).filter((p) => !p.data.draft);
   return rss({
-    title: `${profile.name} — Blog`,
+    title: `${profile.name} | Blog`,
     description: 'Notes from building and running systems: backend, infrastructure and Linux.',
     site: context.site!,
     trailingSlash: true,

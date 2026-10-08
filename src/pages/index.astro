@@ -70,7 +70,7 @@ const jsonLd = [
           <p class="label" aria-hidden="true">NAME</p>
           <div class="indent">
             <h1 class="hero-name" id="name">{profile.name}<span class="cursor blink" aria-hidden="true"></span></h1>
-            <p class="hero-tagline">— {profile.tagline}</p>
+            <p class="hero-tagline">- {profile.tagline}</p>
           </div>
         </div>
         <div class="hero-block">
@@ -94,7 +94,7 @@ const jsonLd = [
         <div class="term-bar" aria-hidden="true">
           <div class="term-dots"><span></span><span></span><span></span></div>
           <span>burak@burakuren: ~</span>
-          <span>{profile.fetch.find((f) => f.key === 'shell')?.value ?? 'bash'}</span>
+          <span>bash</span>
         </div>
         <div class="term-body">
           <div><span class="c-blue">~</span> <span class="c-green">❯</span> fetch</div>
@@ -122,12 +122,12 @@ const jsonLd = [
             </div>
           </div>
           <div><span class="c-blue">~</span> <span class="c-green">❯</span> systemctl status burak</div>
-          <div><span class="c-green">●</span> burak.service — {profile.role}</div>
+          <div><span class="c-green">●</span> burak.service - {profile.role}</div>
           <dl class="status-grid">
             <dt>Loaded:</dt>
             <dd>loaded (<span class="muted">/etc/systemd/system/burak.service</span>; enabled)</dd>
             <dt>Active:</dt>
-            <dd><span class="c-green bold">active (running)</span> — {profile.status}</dd>
+            <dd><span class="c-green bold">active (running)</span>; {profile.status}</dd>
             <dt>Docs:</dt>
             <dd>man burak</dd>
           </dl>
@@ -193,7 +193,7 @@ const jsonLd = [
                   )}
                 </h3>
                 <span class="commit-date">
-                  <time datetime={e.start}>{monthLabel(e.start)}</time> — {e.end ? <time datetime={e.end}>{monthLabel(e.end)}</time> : 'present'}
+                  <time datetime={e.start}>{monthLabel(e.start)}</time> - {e.end ? <time datetime={e.end}>{monthLabel(e.end)}</time> : 'present'}
                 </span>
               </div>
               {e.note && <p class="commit-note">{e.note}</p>}

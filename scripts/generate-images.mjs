@@ -39,7 +39,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <text x="64" y="196" font-family="${mono}" font-size="20" font-weight="700" fill="${c.text}" letter-spacing="1.6">NAME</text>
   <text x="96" y="290" font-family="${mono}" font-size="84" font-weight="700" fill="${c.text}" letter-spacing="-2.5">${esc(profile.name)}</text>
   <rect x="${96 + profile.name.length * 48.5}" y="222" width="8" height="78" fill="${c.green}"/>
-  <text x="96" y="344" font-family="${mono}" font-size="28" fill="${c.muted}">— ${esc(profile.tagline)}</text>
+  <text x="96" y="344" font-family="${mono}" font-size="28" fill="${c.muted}">- ${esc(profile.tagline)}</text>
   <text x="64" y="420" font-family="${mono}" font-size="20" font-weight="700" fill="${c.text}" letter-spacing="1.6">SYNOPSIS</text>
   <text x="96" y="466" font-family="${mono}" font-size="24" xml:space="preserve"><tspan fill="${c.text}" font-weight="700">burak</tspan>${flags}</text>
   <text x="64" y="574" font-family="${mono}" font-size="22" fill="${c.green}">burakuren.com</text>

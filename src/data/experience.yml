@@ -30,7 +30,7 @@ entries:
     start: 2021-01
     note: Self-employed; part-time since Oct 2022.
     highlights:
-      - Launched a teacher–student marketplace for private lessons and grew it to 4,500+ users; I own the backend and infrastructure.
+      - Launched a teacher-student marketplace for private lessons and grew it to 4,500+ users; I own the backend and infrastructure.
       - Built the REST API with Flask, SQLAlchemy (Alembic migrations) and PostgreSQL, including full-text search.
       - Cached search results in Redis keyed by a hash of the query, cutting repeated database round-trips under concurrent traffic.
       - Implemented JWT auth (logins, secure file downloads, password resets, admin impersonation) and a Flask-Admin panel.

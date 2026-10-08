@@ -5,7 +5,7 @@ import { defineHastPlugin } from 'satteri';
  * Turns a paragraph that contains only an image with a title into a
  * <figure> with a <figcaption>:
  *
- *   ![Alt text for screen readers](./diagram.png "fig. 1 — what the image shows")
+ *   ![Alt text for screen readers](./diagram.png "fig. 1: what the image shows")
  *
  * The alt text stays on the image; the title becomes the visible caption.
  * Images without a title are left untouched.

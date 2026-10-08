@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
-# Sveltia CMS configuration — https://sveltiacms.app/en/docs
+# Sveltia CMS configuration: https://sveltiacms.app/en/docs
 # Every save is a commit to `main`; the GitHub Actions workflow then rebuilds
 # and deploys the site.
 
@@ -118,9 +118,9 @@ singletons:
       - { name: name, label: Name, widget: string }
       - { name: handle, label: Handle, widget: string }
       - { name: role, label: Role, widget: string, hint: 'Used in the terminal card and structured data, e.g. "Backend Software Engineer".' }
-      - { name: tagline, label: Tagline, widget: string, hint: 'Shown under your name as "— tagline".' }
-      - { name: seoTitle, label: SEO title, widget: string, hint: Home page <title>. Aim for 50–65 characters. }
-      - { name: seoDescription, label: SEO description, widget: text, hint: Home page meta description. Aim for 140–160 characters. }
+      - { name: tagline, label: Tagline, widget: string, hint: 'Shown under your name as "- tagline".' }
+      - { name: seoTitle, label: SEO title, widget: string, hint: Home page <title>. Aim for 50-65 characters. }
+      - { name: seoDescription, label: SEO description, widget: text, hint: Home page meta description. Aim for 140-160 characters. }
       - name: synopsis
         label: Synopsis flags
         widget: list
@@ -132,7 +132,7 @@ singletons:
         label: About paragraphs
         widget: list
         field: { name: paragraph, label: Paragraph, widget: text }
-      - { name: status, label: Status, widget: string, hint: 'Shown as "active (running) — <status>".' }
+      - { name: status, label: Status, widget: string, hint: 'Shown as "active (running); <status>".' }
       - name: fetch
         label: Terminal card (fetch)
         widget: list

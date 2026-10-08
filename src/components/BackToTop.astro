@@ -1,0 +1,24 @@
+<a class="to-top" href="#top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 20V5" /><path d="m6 11 6-6 6 6" />
+  </svg>
+  <span aria-hidden="true">cd ~</span>
+</a>
+
+<script>
+  const link = document.querySelector<HTMLAnchorElement>('.to-top')!;
+  const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)');
+
+  // Shown only once the reader is a screen or so down the page.
+  const update = () => link.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.6);
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    // Hand keyboard focus back to the start of the page too. Focus first:
+    // moving focus mid-way would cancel the smooth scroll.
+    document.querySelector<HTMLElement>('.site-header .prompt')?.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: smooth.matches ? 'smooth' : 'auto' });
+  });
+</script>

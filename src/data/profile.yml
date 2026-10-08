@@ -2,7 +2,7 @@ name: Burak Üren
 handle: burakuren
 role: Backend Software Engineer
 tagline: backend software engineer
-seoTitle: Burak Üren — Backend Software Engineer (Python, Django, DevOps)
+seoTitle: Burak Üren | Backend Software Engineer (Python, Django, DevOps)
 seoDescription: Backend software engineer in Istanbul. I build REST APIs, microservices and payment systems with Python, Django and Flask, and run them on Linux, Docker and Kubernetes.
 synopsis:
   - flag: --build
@@ -41,8 +41,6 @@ fetch:
     value: backend · devops · linux
   - key: os
     value: openSUSE Tumbleweed
-  - key: shell
-    value: bash
   - key: stack
     value: python · django · postgres
   - key: location

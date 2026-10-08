@@ -34,7 +34,7 @@ Schemas are in `src/content.config.ts`; a CMS edit that doesn't match fails the 
 - Markdown extras:
   - Code fence titles: ` ```ini title="api.socket" `
   - Callouts: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`
-  - Captions: `![alt text](./image.png "fig. 1 — caption")`
+  - Captions: `![alt text](./image.png "fig. 1: caption")`
 
 ## Development
 

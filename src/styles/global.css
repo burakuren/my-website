@@ -1,7 +1,7 @@
 /* ==========================================================================
    Tokens
-   Dark is the default. A stored choice sets [data-theme] on <html> before
-   first paint; without one, the OS preference decides.
+   Dark is the default regardless of OS preference. A stored choice sets
+   [data-theme] on <html> before first paint.
    ========================================================================== */
 
 :root,
@@ -31,22 +31,6 @@
   --blue: #2b5987;
   --dot: #d3cdbf;
   --shadow: rgba(60, 50, 30, 0.22);
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-    --bg: #f3f1ea;
-    --panel: #faf8f2;
-    --line: #d9d4c7;
-    --text: #1d2127;
-    --muted: #555c66;
-    --green: #2f6a2c;
-    --amber: #8a5300;
-    --blue: #2b5987;
-    --dot: #d3cdbf;
-    --shadow: rgba(60, 50, 30, 0.22);
-  }
 }
 
 :root {
@@ -1693,9 +1677,55 @@ a.ls-name:hover {
   font-size: 15px;
 }
 
+/* Back-to-top button: always there without JS, revealed on scroll with it. */
+.to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  box-shadow: 0 6px 18px var(--shadow);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  text-decoration: none;
+}
+.to-top:hover,
+.to-top:focus-visible {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.js .to-top:not(.is-visible) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .to-top {
+    transition:
+      opacity 0.2s,
+      transform 0.2s,
+      visibility 0.2s;
+  }
+}
+@media (max-width: 640px) {
+  .to-top {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
 @media print {
   .site-header,
   .theme-toggle,
+  .to-top,
   .terminal,
   .code-copy,
   .pager {
