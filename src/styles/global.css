@@ -564,7 +564,7 @@ a.tag:hover {
   align-items: center;
   gap: 8px;
 }
-.photo img {
+.photo .avatar {
   display: block;
   width: 152px;
   height: 152px;
@@ -576,36 +576,6 @@ a.tag:hover {
   font-size: 12px;
   line-height: 1.4;
   color: var(--muted);
-}
-
-/* Drawn at 12px and zoomed down, so it reads as an image rather than as
-   tiny body text to legibility audits. Visual size: 6px. */
-.portrait {
-  margin: 0;
-  flex: none;
-  font-family: var(--mono);
-  font-size: 12px;
-  zoom: 0.5;
-  line-height: 1.08;
-  letter-spacing: 0;
-  color: var(--text);
-}
-.portrait-light {
-  display: none;
-}
-:root[data-theme='light'] .portrait-dark {
-  display: none;
-}
-:root[data-theme='light'] .portrait-light {
-  display: block;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) .portrait-dark {
-    display: none;
-  }
-  :root:not([data-theme]) .portrait-light {
-    display: block;
-  }
 }
 
 .fetch-info {
@@ -1609,8 +1579,13 @@ a.ls-name:hover {
   border: 1px solid var(--line);
   border-radius: 8px;
 }
-.author .portrait {
-  zoom: 0.2833;
+.author .avatar {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--bg);
 }
 .author-copy {
   flex: 1 1 280px;

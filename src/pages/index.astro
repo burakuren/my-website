@@ -2,7 +2,8 @@
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ManLine from '../components/ManLine.astro';
-import { getImage, Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import Avatar from '../components/Avatar.astro';
 import photo from '../assets/burak.jpg';
 import SectionHead from '../components/SectionHead.astro';
 import { monthLabel, shortHash } from '../lib/format';
@@ -99,7 +100,7 @@ const jsonLd = [
           <div><span class="c-blue">~</span> <span class="c-green">❯</span> fetch</div>
           <div class="term-fetch">
             <figure class="photo">
-              <Image src={photo} alt={`Photo of ${profile.name}`} width={152} height={152} densities={[1, 2]} loading="eager" fetchpriority="high" />
+              <Avatar size={152} alt={`Photo of ${profile.name}`} eager />
               <figcaption>~/burak.jpg</figcaption>
             </figure>
             <div class="fetch-info">

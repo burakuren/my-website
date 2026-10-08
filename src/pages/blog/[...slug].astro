@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { getEntry, render } from 'astro:content';
 import { getImage, Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Portrait from '../../components/Portrait.astro';
+import Avatar from '../../components/Avatar.astro';
 import { getPosts, postUrl, type Post } from '../../lib/posts';
 import { isoDate, readingMinutes } from '../../lib/format';
 import { SITE_URL } from '../../site.config.mjs';
@@ -135,7 +135,7 @@ const jsonLd = [
         </div>
 
         <section class="author" aria-label="About the author">
-          <Portrait />
+          <Avatar size={96} alt={`Photo of ${profile.name}`} />
           <div class="author-copy">
             <div class="author-cmd" aria-hidden="true">$ whoami</div>
             <p class="author-name">{profile.name}</p>

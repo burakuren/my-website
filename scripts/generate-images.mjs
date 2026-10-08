@@ -4,7 +4,6 @@
 import sharp from 'sharp';
 import { readFile } from 'node:fs/promises';
 import { parse } from 'yaml';
-import { portraitDark } from '../src/lib/portraits.ts';
 
 const profile = parse(await readFile(new URL('../src/data/profile.yml', import.meta.url), 'utf8'));
 const out = (p) => new URL(`../public/${p}`, import.meta.url).pathname;
@@ -12,10 +11,13 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
 const mono = "'JetBrains Mono', 'JetBrainsMono Nerd Font Mono', 'JetBrainsMono Nerd Font', monospace";
 const c = { bg: '#15171c', panel: '#1b1e25', line: '#2b3038', text: '#d7dae0', muted: '#9198a4', green: '#97c58e', amber: '#e2b466', blue: '#90b4da', dot: '#2a2f39' };
 
-const portrait = portraitDark
-  .split('\n')
-  .map((l, i) => `<tspan x="884" y="${118 + i * 11.4}">${esc(l)}</tspan>`)
-  .join('');
+// Circular photo on the right, framed like the fetch card on the home page.
+const PHOTO = { x: 860, y: 150, size: 260 };
+const photoPng = await sharp(new URL('../src/assets/burak.jpg', import.meta.url).pathname)
+  .resize(PHOTO.size, PHOTO.size)
+  .composite([{ input: Buffer.from(`<svg width="${PHOTO.size}" height="${PHOTO.size}"><circle cx="${PHOTO.size / 2}" cy="${PHOTO.size / 2}" r="${PHOTO.size / 2}"/></svg>`), blend: 'dest-in' }])
+  .png()
+  .toBuffer();
 
 const flags = profile.synopsis
   .map((s) => `<tspan fill="${c.text}"> [</tspan><tspan fill="${c.amber}">${esc(s.flag)}</tspan><tspan fill="${c.text}"> ${esc(s.arg)}]</tspan>`)
@@ -42,10 +44,14 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <text x="96" y="466" font-family="${mono}" font-size="24" xml:space="preserve"><tspan fill="${c.text}" font-weight="700">burak</tspan>${flags}</text>
   <text x="64" y="574" font-family="${mono}" font-size="22" fill="${c.green}">burakuren.com</text>
   <text x="1136" y="574" font-family="${mono}" font-size="20" fill="${c.muted}" text-anchor="end">python · django · devops · linux</text>
-  <text font-family="${mono}" font-size="11" fill="${c.text}" xml:space="preserve" opacity="0.9">${portrait}</text>
+  <circle cx="${PHOTO.x + PHOTO.size / 2}" cy="${PHOTO.y + PHOTO.size / 2}" r="${PHOTO.size / 2 + 3}" fill="${c.line}"/>
+  <text x="${PHOTO.x + PHOTO.size / 2}" y="${PHOTO.y + PHOTO.size + 40}" font-family="${mono}" font-size="18" fill="${c.muted}" text-anchor="middle">~/burak.jpg</text>
 </svg>`;
 
-await sharp(Buffer.from(og)).png({ compressionLevel: 9 }).toFile(out('og.png'));
+await sharp(Buffer.from(og))
+  .composite([{ input: photoPng, left: PHOTO.x, top: PHOTO.y }])
+  .png({ compressionLevel: 9 })
+  .toFile(out('og.png'));
 
 const icon = (size, radius) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="${radius}" fill="${c.bg}"/>

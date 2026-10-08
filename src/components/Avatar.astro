@@ -1,0 +1,29 @@
+---
+import { Picture } from 'astro:assets';
+import photo from '../assets/burak.jpg';
+
+interface Props {
+  /** Rendered size in CSS pixels (the image is square). */
+  size: number;
+  alt: string;
+  eager?: boolean;
+}
+
+const { size, alt, eager = false } = Astro.props;
+// AVIF first, then WebP, with the original JPEG as the fallback <img>;
+// 1x and 2x of each so it stays sharp on high-density screens.
+---
+
+<Picture
+  src={photo}
+  alt={alt}
+  width={size}
+  height={size}
+  densities={[1, 2]}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpg"
+  quality={80}
+  class="avatar"
+  loading={eager ? 'eager' : 'lazy'}
+  fetchpriority={eager ? 'high' : 'auto'}
+/>
