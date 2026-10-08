@@ -8,6 +8,7 @@ projects:
       Redis-cached results and JWT auth; moved off Kubernetes to a hardened
       server with one-click GitHub Actions deploys.
     tags: [flask, postgres, redis]
+    category: backend
   - name: matfabe-referral
     kind: dir
     url: https://tavsiye.matfabe.com
@@ -17,6 +18,7 @@ projects:
       stage transitions, Google sign-in, and versioned Docker images shipped by
       GitHub Actions.
     tags: [django, htmx, docker]
+    category: backend
   - name: burakuren.com
     kind: file
     url: https://github.com/burakuren/my-website
@@ -24,3 +26,4 @@ projects:
       This site. A static Astro build with Sveltia CMS for content, served from
       Cloudflare Workers.
     tags: [astro, cloudflare]
+    category: devops

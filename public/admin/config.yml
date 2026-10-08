@@ -66,6 +66,12 @@ collections:
       - label: Drafts
         field: draft
         pattern: true
+    view_groups:
+      - label: Category
+        field: category
+      - label: Year
+        field: pubDate
+        pattern: '\d{4}'
     fields:
       - name: title
         label: Title
@@ -97,6 +103,14 @@ collections:
         required: false
         options: [backend, devops, linux, python, django, databases, notes]
         hint: Add new tags to this list in public/admin/config.yml.
+      - name: category
+        label: Category
+        widget: relation
+        collection: lab_categories
+        value_field: '{{slug}}'
+        display_fields: [name]
+        required: false
+        hint: 'Lab: picks from the Categories collection.'
       - name: cover
         label: Cover image
         widget: image
@@ -318,7 +332,7 @@ singletons:
       - name: projects
         label: Projects
         widget: list
-        summary: '{{fields.name}}'
+        summary: '{{fields.name}} · {{fields.category}}'
         fields:
           - { name: name, label: Name, widget: string }
           - name: kind
@@ -331,6 +345,13 @@ singletons:
           - { name: url, label: URL, widget: string, required: false }
           - { name: description, label: Description, widget: text }
           - { name: tags, label: Tags, widget: list, required: false }
+          - name: category
+            label: Category
+            widget: relation
+            collection: lab_categories
+            value_field: '{{slug}}'
+            display_fields: [name]
+            required: false
 
   - name: experience
     label: Experience

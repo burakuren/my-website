@@ -2,6 +2,7 @@
 import { getEntries, getEntry } from 'astro:content';
 import { Code } from 'astro:components';
 import LabLayout from '../../components/LabLayout.astro';
+import LabBlocks from '../../components/LabBlocks.astro';
 import { markdownToHtml } from 'satteri';
 import { noteUrl } from '../../lib/lab';
 
@@ -52,20 +53,5 @@ const osm = point && `https://www.openstreetmap.org/?mlat=${point[1]}&mlon=${poi
   </table>
 
   <section aria-labelledby="blocks"><h2 id="blocks">$ render blocks <span class="muted">(list with types)</span></h2></section>
-  <div class="prose">
-    {
-      w.blocks.map((b) => {
-        switch (b.type) {
-          case 'heading':
-            return <h3>{b.text}</h3>;
-          case 'paragraph':
-            return <Fragment set:html={md(b.text)} />;
-          case 'callout':
-            return <p class="lab-callout" data-kind={b.kind}><strong>{b.kind}:</strong> {b.text}</p>;
-          case 'link':
-            return <p><a href={b.url} rel="noopener">{b.label} →</a></p>;
-        }
-      })
-    }
-  </div>
+  <LabBlocks />
 </LabLayout>

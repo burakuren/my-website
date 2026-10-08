@@ -1,0 +1,157 @@
+/* Lab: styles for the temporary Sveltia CMS playground (/lab/ and home sections). */
+
+.lab {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 64px;
+}
+.lab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.lab-nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.lab-nav a[aria-current='page'] {
+  color: var(--green);
+}
+@media (hover: hover) {
+  .lab-nav a:hover {
+    color: var(--text);
+  }
+}
+.lab h1 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 28px;
+}
+.lab h2 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--amber);
+}
+.lab .lede {
+  margin: 0;
+  color: var(--muted);
+}
+.lab-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.lab-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent, var(--line));
+  background: var(--panel);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text);
+}
+.lab-card strong {
+  font-family: var(--mono);
+  color: var(--accent, var(--green));
+}
+.lab-card span {
+  color: var(--muted);
+  font-size: 14px;
+}
+.lab-notes .ls-row {
+  grid-template-columns: 110px 90px minmax(0, 1fr) 140px;
+}
+@media (max-width: 860px) {
+  .lab-notes .ls-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .lab-notes .ls-row > div,
+  .lab-notes .ls-row > span:last-child {
+    grid-column: 1 / -1;
+  }
+}
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent, var(--muted));
+  margin-right: 6px;
+}
+.lab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.lab-table th,
+.lab-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.lab-table th {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.lab-table code,
+.lab-table pre {
+  font-family: var(--mono);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.lab-tree,
+.lab-tree ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 18px;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.lab-tree {
+  padding-left: 0;
+}
+.lab-tree li {
+  padding: 2px 0;
+}
+.lab-tree a[aria-current='page'] {
+  color: var(--amber);
+}
+.lab-split {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 32px;
+}
+@media (max-width: 760px) {
+  .lab-split {
+    grid-template-columns: 1fr;
+  }
+}
+.lab-callout {
+  border-left: 3px solid var(--blue);
+  padding: 8px 14px;
+  background: var(--panel);
+}
+.lab-callout[data-kind='tip'] {
+  border-color: var(--green);
+}
+.lab-callout[data-kind='warning'] {
+  border-color: var(--amber);
+}
+.lab-project-filter {
+  margin-bottom: 12px;
+}
+.lab-table td a {
+  white-space: nowrap;
+}

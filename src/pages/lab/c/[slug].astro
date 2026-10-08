@@ -1,14 +1,21 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
 import LabLayout from '../../../components/LabLayout.astro';
 import LabNoteList from '../../../components/LabNoteList.astro';
 import { getCategories, getNotes, type LabCategory } from '../../../lib/lab';
+import { getPosts, postUrl } from '../../../lib/posts';
+import { isoDate } from '../../../lib/format';
 
 export const getStaticPaths = (async () => (await getCategories()).map((category) => ({ params: { slug: category.id }, props: { category } }))) satisfies GetStaticPaths;
 
 const { category } = Astro.props as { category: LabCategory };
 const categories = await getCategories();
 const notes = await getNotes((n) => n.data.category.id === category.id);
+// Everything else that references this category through a Relation field.
+const posts = (await getPosts()).filter((p) => p.data.category?.id === category.id);
+const projects = (await getCollection('projects', (p) => p.data.category?.id === category.id)).sort((a, b) => a.data.order - b.data.order);
+const glossary = await getCollection('labGlossary', (t) => t.data.en.category?.id === category.id);
 ---
 
 <LabLayout title={category.data.name} description={category.data.description ?? category.data.name} cwd={`~/lab/c/${category.id}`}>
@@ -16,5 +23,30 @@ const notes = await getNotes((n) => n.data.category.id === category.id);
     <h1><span class="dot" />{category.data.name}</h1>
     <p class="lede">{category.data.description}</p>
   </header>
+
+  <h2>$ grep -rl "category: {category.id}" blog/ <span class="muted">({posts.length})</span></h2>
+  <ul class="lab-tree">
+    {posts.map((p) => <li><span class="muted">{isoDate(p.data.pubDate)}</span> <a href={postUrl(p)}>{p.data.title}</a></li>)}
+    {posts.length === 0 && <li class="muted">no posts</li>}
+  </ul>
+
+  <h2>$ grep projects.yml <span class="muted">({projects.length})</span></h2>
+  <ul class="lab-tree">
+    {projects.map((p) => <li>{p.data.url ? <a href={p.data.url} rel="noopener">{p.data.name}</a> : p.data.name} <span class="muted">{p.data.tags.join(', ')}</span></li>)}
+    {projects.length === 0 && <li class="muted">no projects</li>}
+  </ul>
+
+  <h2>$ ls notes/ <span class="muted">({notes.length})</span></h2>
   <LabNoteList notes={notes} categories={categories} />
+
+  {
+    glossary.length > 0 && (
+      <>
+        <h2>$ grep glossary/ <span class="muted">({glossary.length})</span></h2>
+        <ul class="lab-tree">
+          {glossary.map((t) => <li><a href="/lab/glossary/">{t.data.en.term}</a> <span class="muted" lang="tr">{t.data.tr?.term}</span></li>)}
+        </ul>
+      </>
+    )
+  }
 </LabLayout>

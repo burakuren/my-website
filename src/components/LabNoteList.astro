@@ -10,7 +10,7 @@ const { notes, categories } = Astro.props;
 const byId = new Map(categories.map((c) => [c.id, c]));
 ---
 
-<div class="ls">
+<div class="ls lab-notes">
   <div class="ls-total" aria-hidden="true">total {notes.length}</div>
   <ul class="ls-list" role="list">
     {

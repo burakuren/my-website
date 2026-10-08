@@ -17,6 +17,8 @@ const blog = defineCollection({
       pubDate: z.coerce.date(),
       updatedDate: z.coerce.date().optional(),
       tags: z.array(z.string()).default([]),
+      // Lab: relation to the lab categories collection.
+      category: reference('labCategories').optional(),
       cover: image().optional(),
       coverAlt: z.string().optional(),
       draft: z.boolean().default(false),
@@ -68,6 +70,8 @@ const projects = defineCollection({
     url: z.url().optional(),
     description: z.string(),
     tags: z.array(z.string()).default([]),
+    // Lab: relation to the lab categories collection.
+    category: reference('labCategories').optional(),
   }),
 });
 

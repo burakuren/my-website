@@ -1,10 +1,6 @@
 ---
-import { getCollection } from 'astro:content';
 import LabLayout from '../../components/LabLayout.astro';
-import { categoryUrl, getCategories } from '../../lib/lab';
-
-const terms = (await getCollection('labGlossary')).sort((a, b) => a.data.en.term.localeCompare(b.data.en.term));
-const categories = new Map((await getCategories()).map((c) => [c.id, c]));
+import LabGlossary from '../../components/LabGlossary.astro';
 ---
 
 <LabLayout title="Glossary" description="Translated glossary entries edited with Sveltia's i18n support." cwd="~/lab/glossary">
@@ -12,21 +8,5 @@ const categories = new Map((await getCategories()).map((c) => [c.id, c]));
     <h1>glossary</h1>
     <p class="lede">i18n with the <code>single_file</code> structure: each YAML file holds <code>en:</code> and <code>tr:</code> side by side.</p>
   </header>
-  <table class="lab-table">
-    <thead><tr><th>EN</th><th lang="tr">TR</th><th>CATEGORY</th></tr></thead>
-    <tbody>
-      {
-        terms.map((t) => {
-          const cat = t.data.en.category && categories.get(t.data.en.category.id);
-          return (
-            <tr>
-              <td><strong>{t.data.en.term}</strong><br /><span class="muted">{t.data.en.definition}</span></td>
-              <td lang="tr"><strong>{t.data.tr?.term ?? '-'}</strong><br /><span class="muted">{t.data.tr?.definition}</span></td>
-              <td>{cat && <a href={categoryUrl(cat.id)} style={`--accent: ${cat.data.color}`}><span class="dot" />{cat.data.name}</a>}</td>
-            </tr>
-          );
-        })
-      }
-    </tbody>
-  </table>
+  <LabGlossary />
 </LabLayout>
