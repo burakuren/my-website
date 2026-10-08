@@ -5,7 +5,6 @@ pubDate: 2026-09-14
 tags:
   - linux
   - devops
-cover: lotr-1.jpg
 draft: true
 ---
 
@@ -16,8 +15,6 @@ A typical deploy replaces a binary and restarts the service. Between the old pro
 > The fix isn't a faster restart. It's making sure someone is always holding the socket.
 
 ## How socket activation works
-
-![](picture_2025-10-14_16-34-26.jpg)
 
 systemd opens the listening socket itself, then hands it to your service as an inherited file descriptor. When the service restarts, the socket never closes: new connections wait in the kernel's accept backlog until the new process picks them up.
 
