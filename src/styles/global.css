@@ -72,6 +72,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* viewport-fit=cover (Base.astro) lets the page draw under Android's gesture
+   bar instead of Chrome's "chin" sliding in over it while scrolling; keep
+   content clear of notches in landscape. */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
 main {
   flex: 1 0 auto;
 }
@@ -370,7 +378,7 @@ samp {
 }
 .site-footer .wrap {
   padding-top: 20px;
-  padding-bottom: 28px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -1854,7 +1862,7 @@ a.ls-name:hover {
 .to-top {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   z-index: 50;
   display: inline-flex;
   align-items: center;
@@ -1893,14 +1901,12 @@ a.ls-name:hover {
       visibility 0.2s;
   }
 }
-@media (max-width: 640px) {
+/* Phones: the sticky header's prompt doubles as "cd ~". A fixed button at the
+   bottom also fights Firefox Android's bottom toolbar (it reappears and
+   shifts the page while scrolling). */
+@media (max-width: 760px) {
   .to-top {
-    right: 16px;
-    bottom: 16px;
-  }
-  /* Room for the back-to-top button at the very end of the page. */
-  .site-footer .wrap {
-    padding-bottom: 76px;
+    display: none;
   }
 }
 

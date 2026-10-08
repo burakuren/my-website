@@ -6,8 +6,9 @@
 </a>
 
 <script>
+  import { scrollToTop } from '../lib/scroll-top';
+
   const link = document.querySelector<HTMLAnchorElement>('.to-top')!;
-  const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)');
 
   // Shown only once the reader is a screen or so down the page.
   const update = () => link.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.6);
@@ -16,9 +17,6 @@
 
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    // Hand keyboard focus back to the start of the page too. Focus first:
-    // moving focus mid-way would cancel the smooth scroll.
-    document.querySelector<HTMLElement>('.site-header .prompt')?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: smooth.matches ? 'smooth' : 'auto' });
+    scrollToTop();
   });
 </script>

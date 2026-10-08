@@ -34,6 +34,8 @@ const links = [
 </header>
 
 <script>
+  import { scrollToTop } from '../lib/scroll-top';
+
   // Small screens collapse the nav behind a toggle; without JS it stays visible.
   const header = document.querySelector<HTMLElement>('.site-header')!;
   const toggle = header.querySelector<HTMLButtonElement>('.nav-toggle')!;
@@ -45,6 +47,15 @@ const links = [
 
   toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
   header.querySelectorAll('.site-nav a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  // On the home page the prompt is "cd ~": scroll up instead of reloading.
+  // (Phones rely on this; the floating back-to-top button is desktop only.)
+  header.querySelector('.prompt')!.addEventListener('click', (e) => {
+    if (location.pathname !== '/') return;
+    e.preventDefault();
+    setOpen(false);
+    if (location.hash) history.replaceState(null, '', '/');
+    scrollToTop();
+  });
   document.addEventListener('click', (e) => {
     if (!header.contains(e.target as Node)) setOpen(false);
   });
