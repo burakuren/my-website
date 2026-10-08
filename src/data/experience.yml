@@ -1,0 +1,46 @@
+entries:
+  - role: Backend Developer
+    org: MatFabe
+    url: https://tavsiye.matfabe.com
+    kind: work
+    ref: HEAD -> current
+    start: 2026-03
+    highlights:
+      - Building a referral platform for a private tutoring service with Django and PostgreSQL, live in production with about 100 users.
+      - Modeled a multi-level referrer invitation network and an ordered outreach pipeline that enforces valid stage transitions.
+      - Implemented django-allauth with Google sign-in and a feature-flagged admin-approval mode, test-first with pytest and factory-boy.
+      - Containerized with Docker; GitHub Actions publishes versioned images to DigitalOcean Container Registry.
+  - role: Backend Developer
+    org: SMGrader
+    kind: work
+    start: 2022-10
+    end: 2025-11
+    highlights:
+      - Developed the REST API of an AI-powered grading platform with Django REST Framework, plus async microservices on Celery, RabbitMQ and Redis.
+      - Built organization-level RBAC on Django's permission framework and integrated Stripe with per-user token budgets.
+      - Created a background job system with monitoring, task tracking and graceful cancellation via a Redis flag checked by workers.
+      - Cut database load by caching metadata shared across background tasks in Redis, read-through with TTL expiry.
+      - Built message-level logging with alerting through Grafana, Loki and Slack, and a two-way data sync with Canvas LMS.
+      - Built services on AWS (RDS, S3, EKS, ElastiCache), deployed through Jenkins, and helped the DevOps team with Kubernetes scaling.
+  - role: Founder & Backend Developer
+    org: BanaDersBul
+    url: https://www.banadersbul.com
+    kind: work
+    ref: side-project
+    start: 2021-01
+    note: Self-employed; part-time since Oct 2022.
+    highlights:
+      - Launched a teacher–student marketplace for private lessons and grew it to 4,500+ users; I own the backend and infrastructure.
+      - Built the REST API with Flask, SQLAlchemy (Alembic migrations) and PostgreSQL, including full-text search.
+      - Cached search results in Redis keyed by a hash of the query, cutting repeated database round-trips under concurrent traffic.
+      - Implemented JWT auth (logins, secure file downloads, password resets, admin impersonation) and a Flask-Admin panel.
+      - Migrated from a DigitalOcean Kubernetes cluster to a hardened server, cutting cost, with one-click GitHub Actions deploys.
+  - role: B.Sc. Mathematics and Computer Science
+    org: Istanbul Kültür University
+    kind: education
+    ref: init
+    start: 2022-09
+    end: 2026-06
+    highlights:
+      - Mentored student coders in the Patika.dev program and ran Linux community events.
+      - Erasmus+ BIP on metacognition in education with EU partner universities (2026).

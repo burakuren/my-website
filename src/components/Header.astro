@@ -1,0 +1,59 @@
+---
+interface Props {
+  section: 'home' | 'blog' | 'none';
+  cwd: string;
+}
+
+const { section, cwd } = Astro.props;
+// On the home page the section links are in-page anchors.
+const base = section === 'home' ? '' : '/';
+const links = [
+  { href: `${base}#about`, label: './about' },
+  { href: `${base}#projects`, label: './projects' },
+  { href: `${base}#experience`, label: './experience' },
+  { href: '/blog/', label: './blog', current: section === 'blog' },
+  { href: `${base}#contact`, label: './contact' },
+];
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="/" class="prompt" {...(section === 'home' ? { 'aria-current': 'page' } : {})}>
+      <span class="c-green">burak@burakuren</span><span class="muted">:</span><span class="c-blue">{cwd}</span><span class="muted">$</span><span class="cursor" aria-hidden="true"></span><span class="visually-hidden"> (home)</span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      {links.map((l) => <a href={l.href} {...(l.current ? { 'aria-current': 'page' } : {})}>{l.label}</a>)}
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        <button type="button" data-set-theme="dark" aria-pressed="true">dark</button>
+        <button type="button" data-set-theme="light" aria-pressed="false">light</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-set-theme]');
+  const current = () => root.dataset.theme ?? (prefersLight.matches ? 'light' : 'dark');
+
+  function sync() {
+    const theme = current();
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setTheme === theme)));
+    const color = theme === 'light' ? '#f3f1ea' : '#15171c';
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
+  }
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const theme = b.dataset.setTheme!;
+      root.dataset.theme = theme;
+      try {
+        localStorage.setItem('theme', theme);
+      } catch {}
+      sync();
+    }),
+  );
+  prefersLight.addEventListener('change', sync);
+  sync();
+</script>

@@ -1,0 +1,207 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getEntry, render } from 'astro:content';
+import { getImage, Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Portrait from '../../components/Portrait.astro';
+import { getPosts, postUrl, type Post } from '../../lib/posts';
+import { isoDate, readingMinutes } from '../../lib/format';
+import { SITE_URL } from '../../site.config.mjs';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  // Posts are sorted newest first: the "older" post is the next one in the list.
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, older: posts[i + 1], newer: posts[i - 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: Post;
+  older?: Post;
+  newer?: Post;
+}
+
+const { post, older, newer } = Astro.props;
+const { Content, headings } = await render(post);
+const profile = (await getEntry('profile', 'profile'))!.data;
+const { title, description, pubDate, updatedDate, tags, cover, coverAlt } = post.data;
+
+const toc = headings.filter((h) => h.depth === 2);
+const minutes = readingMinutes(post.body ?? '');
+const modified = updatedDate ?? pubDate;
+const url = `${SITE_URL}${postUrl(post)}`;
+const github = profile.social.find((s) => s.key === 'github');
+
+const og = cover ? await getImage({ src: cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 82 }) : undefined;
+const mistakeMail = `mailto:${profile.email}?subject=${encodeURIComponent(`Re: ${title}`)}`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#post`,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    url,
+    headline: title,
+    description,
+    datePublished: pubDate.toISOString(),
+    dateModified: modified.toISOString(),
+    inLanguage: 'en',
+    keywords: tags.join(', '),
+    wordCount: (post.body ?? '').split(/\s+/).filter(Boolean).length,
+    image: og ? new URL(og.src, SITE_URL).href : `${SITE_URL}/og.png`,
+    author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: profile.name, url: `${SITE_URL}/` },
+    publisher: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: profile.name, url: `${SITE_URL}/` },
+    isPartOf: { '@type': 'Blog', '@id': `${SITE_URL}/blog/#blog` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog/` },
+      { '@type': 'ListItem', position: 3, name: title, item: url },
+    ],
+  },
+];
+---
+
+<Base
+  title={`${title} — ${profile.name}`}
+  description={description}
+  section="blog"
+  cwd="~/blog"
+  manPage="BLOG(7)"
+  ogType="article"
+  ogImage={og?.src}
+  ogImageAlt={cover ? (coverAlt ?? title) : undefined}
+  article={{ published: pubDate, modified: updatedDate, tags }}
+  noindex={post.data.draft}
+  jsonLd={jsonLd}
+>
+  <main id="main" class="wrap" tabindex="-1">
+    <nav class="post-crumbs" aria-label="Breadcrumb">
+      <a href="/blog/">← cd ../blog</a>
+      <span aria-hidden="true">~/blog/{post.id}.md</span>
+    </nav>
+
+    <header class="post-header">
+      <div class="post-header-meta">
+        <time datetime={pubDate.toISOString()}>{isoDate(pubDate)}</time><span aria-hidden="true">·</span><span>{minutes} min read</span>
+        {tags.length > 0 && <span aria-hidden="true">·</span>}
+        {tags.map((t) => <a class="tag" href={`/blog/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
+        {post.data.draft && <span class="c-amber">(draft — not published)</span>}
+      </div>
+      <h1 id="post-title">{title}</h1>
+      <p class="lede">{description}</p>
+      {
+        cover && (
+          <figure class="post-cover">
+            <Image src={cover} alt={coverAlt ?? ''} widths={[720, 1120, 1600]} sizes="(min-width: 1184px) 860px, calc(100vw - 32px)" loading="eager" fetchpriority="high" />
+          </figure>
+        )
+      }
+    </header>
+
+    <div class="post-layout">
+      {
+        toc.length > 1 && (
+          <nav class="toc" aria-labelledby="toc-title">
+            <h2 id="toc-title">CONTENTS</h2>
+            <ol>
+              {toc.map((h, i) => (
+                <li>
+                  <a href={`#${h.slug}`}>
+                    <span>{i + 1}</span>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <article class="post-body" aria-labelledby="post-title">
+        <div class="prose">
+          <Content />
+        </div>
+
+        <div class="post-foot">
+          <span>last modified <time datetime={modified.toISOString()}>{isoDate(modified)}</time></span>
+          <a href={mistakeMail}>found a mistake? → mail me</a>
+        </div>
+
+        <section class="author" aria-label="About the author">
+          <Portrait />
+          <div class="author-copy">
+            <div class="author-cmd" aria-hidden="true">$ whoami</div>
+            <p class="author-name">{profile.name}</p>
+            <p>{profile.role} — backend, devops, Linux. I write here about things I've built, broken and fixed.</p>
+            <div class="author-links">
+              <a href="/#about">~/about</a>
+              <a href="/rss.xml">rss.xml</a>
+              {github && <a href={github.url} rel="me noopener">github</a>}
+            </div>
+          </div>
+        </section>
+
+        <nav class="pager" aria-label="More posts">
+          {
+            older ? (
+              <a href={postUrl(older)} rel="prev">
+                <small>← git log HEAD~1</small>
+                <strong>{older.data.title}</strong>
+              </a>
+            ) : (
+              <div class="none">
+                <small>← older</small>
+                <strong>This is the first post. git log stops here.</strong>
+              </div>
+            )
+          }
+          {
+            newer ? (
+              <a href={postUrl(newer)} rel="next" class="next">
+                <small>newer →</small>
+                <strong>{newer.data.title}</strong>
+              </a>
+            ) : (
+              <div class="none next">
+                <small>newer →</small>
+                <strong>You're at HEAD — this is the latest post.</strong>
+              </div>
+            )
+          }
+        </nav>
+      </article>
+    </div>
+  </main>
+</Base>
+
+<script>
+  // Reveal the copy buttons rendered by the Shiki transformer and wire them up.
+  if (navigator.clipboard) {
+    document.querySelectorAll<HTMLButtonElement>('.code-copy').forEach((button) => {
+      button.hidden = false;
+      let timer: number | undefined;
+      button.addEventListener('click', async () => {
+        const code = button.closest('.code-block')?.querySelector('pre code')?.textContent ?? '';
+        try {
+          await navigator.clipboard.writeText(code);
+          button.textContent = 'copied ✓';
+          button.classList.add('is-copied');
+        } catch {
+          button.textContent = 'copy failed';
+        }
+        clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          button.textContent = 'copy';
+          button.classList.remove('is-copied');
+        }, 1600);
+      });
+    });
+  }
+</script>

@@ -1,0 +1,33 @@
+projects:
+  - name: banadersbul
+    kind: dir
+    url: https://www.banadersbul.com
+    description: >-
+      Teacher–student marketplace for private lessons that I founded and run,
+      grown to 4,500+ users. Flask REST API with PostgreSQL full-text search,
+      Redis-cached results and JWT auth; moved off Kubernetes to a hardened
+      server with one-click GitHub Actions deploys.
+    tags: [flask, postgres, redis]
+  - name: matfabe-referral
+    kind: dir
+    url: https://tavsiye.matfabe.com
+    description: >-
+      Referral platform for a private tutoring service, live with about 100
+      users. Multi-level invitation network, an outreach pipeline with enforced
+      stage transitions, Google sign-in, and versioned Docker images shipped by
+      GitHub Actions.
+    tags: [django, htmx, docker]
+  - name: liked-list-to-playlist
+    kind: dir
+    url: https://github.com/burakuren/Liked-List-To-PlayList
+    description: >-
+      A small Python tool that turns your YouTube Music liked songs into a
+      playlist, or refreshes an existing one from the liked list.
+    tags: [python, automation]
+  - name: burakuren.com
+    kind: file
+    url: https://github.com/burakuren/my-website
+    description: >-
+      This site. A static Astro build with Sveltia CMS for content, served from
+      Cloudflare Workers.
+    tags: [astro, cloudflare]

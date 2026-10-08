@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import ManLine from '../components/ManLine.astro';
+---
+
+<Base title="404: No such file or directory — Burak Üren" description="This page doesn't exist." noindex>
+  <main id="main" class="wrap" tabindex="-1">
+    <ManLine page="ERRNO(3)" title="Library Functions Manual" />
+    <section class="not-found" aria-labelledby="nf-title">
+      <p><span class="c-blue">~</span> <span class="c-green">❯</span> cat <span data-path>this-page</span></p>
+      <h1 id="nf-title">404: No such file or directory</h1>
+      <p class="muted">The page you were looking for has moved, or never existed.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/">cd ~</a>
+        <a class="btn" href="/blog/">ls ~/blog</a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  const el = document.querySelector('[data-path]');
+  if (el) el.textContent = decodeURIComponent(location.pathname).slice(1) || '.';
+</script>

@@ -1,0 +1,249 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ManLine from '../components/ManLine.astro';
+import Portrait from '../components/Portrait.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { monthLabel, shortHash } from '../lib/format';
+import { SITE_URL } from '../site.config.mjs';
+
+const profile = (await getEntry('profile', 'profile'))!.data;
+const skills = (await getEntry('skills', 'skills'))!.data;
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).map((p) => p.data);
+const experience = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order).map((e) => e.data);
+
+const mailto = `mailto:${profile.email}`;
+const cvFileName = `${profile.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_')}_CV.pdf`;
+const keyWidth = Math.max(...skills.groups.flatMap((g) => g.items.map((i) => i.key.length)));
+const isExternal = (url: string) => /^https?:\/\//.test(url);
+
+const person = {
+  '@type': 'Person',
+  '@id': `${SITE_URL}/#person`,
+  name: profile.name,
+  alternateName: 'Burak Uren',
+  url: `${SITE_URL}/`,
+  image: `${SITE_URL}/og.png`,
+  jobTitle: profile.role,
+  description: profile.seoDescription,
+  email: `mailto:${profile.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: profile.location.city, addressCountry: profile.location.country },
+  sameAs: profile.social.map((s) => s.url),
+  knowsAbout: profile.knowsAbout,
+  knowsLanguage: ['tr', 'en'],
+  ...(profile.alumniOf ? { alumniOf: { '@type': 'CollegeOrUniversity', name: profile.alumniOf } } : {}),
+};
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${SITE_URL}/#profilepage`,
+    url: `${SITE_URL}/`,
+    name: profile.seoTitle,
+    inLanguage: 'en',
+    mainEntity: person,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    url: `${SITE_URL}/`,
+    name: profile.name,
+    inLanguage: 'en',
+    publisher: { '@id': `${SITE_URL}/#person` },
+  },
+];
+---
+
+<Base title={profile.seoTitle} description={profile.seoDescription} section="home" ogType="profile" jsonLd={jsonLd}>
+  <main id="main" class="wrap" tabindex="-1">
+    <ManLine page="UREN(1)" title="User Commands" />
+
+    <section class="hero" aria-labelledby="name">
+      <div class="hero-copy">
+        <div class="hero-block">
+          <p class="label" aria-hidden="true">NAME</p>
+          <div class="indent">
+            <h1 class="hero-name" id="name">{profile.name}<span class="cursor blink" aria-hidden="true"></span></h1>
+            <p class="hero-tagline">— {profile.tagline}</p>
+          </div>
+        </div>
+        <div class="hero-block">
+          <p class="label" aria-hidden="true">SYNOPSIS</p>
+          <p class="synopsis indent">
+            <span class="bold">burak</span>
+            {profile.synopsis.map((s) => <>{' '}<span class="nowrap">[<span class="c-amber">{s.flag}</span> {s.arg}]</span></>)}
+          </p>
+        </div>
+        <div class="hero-block">
+          <p class="label" aria-hidden="true">DESCRIPTION</p>
+          <p class="hero-desc indent">{profile.description}</p>
+        </div>
+        <div class="btn-row indent">
+          <a class="btn btn-primary" href="#projects">ls ~/projects</a>
+          {profile.resume && <a class="btn" href={profile.resume} download={cvFileName}>curl -O cv.pdf</a>}
+        </div>
+      </div>
+
+      <aside class="terminal" aria-label="Terminal summary">
+        <div class="term-bar" aria-hidden="true">
+          <div class="term-dots"><span></span><span></span><span></span></div>
+          <span>burak@burakuren: ~</span>
+          <span>{profile.fetch.find((f) => f.key === 'shell')?.value ?? 'bash'}</span>
+        </div>
+        <div class="term-body">
+          <div><span class="c-blue">~</span> <span class="c-green">❯</span> fetch</div>
+          <div class="term-fetch">
+            <Portrait />
+            <div class="fetch-info">
+              <dl class="kv">
+                <dt class="c-green bold">burak</dt>
+                <dd><span class="muted">@</span><span class="c-green bold">burakuren</span></dd>
+                <dt class="muted" aria-hidden="true">-----</dt>
+                <dd class="muted" aria-hidden="true">----------</dd>
+                {profile.fetch.map((f) => <><dt>{f.key}</dt><dd>{f.value}</dd></>)}
+              </dl>
+              <div class="swatches" aria-hidden="true">
+                <span style="background: var(--text)"></span>
+                <span style="background: var(--muted)"></span>
+                <span style="background: var(--green)"></span>
+                <span style="background: var(--amber)"></span>
+                <span style="background: var(--blue)"></span>
+                <span style="background: var(--line)"></span>
+              </div>
+            </div>
+          </div>
+          <div><span class="c-blue">~</span> <span class="c-green">❯</span> systemctl status burak</div>
+          <div><span class="c-green">●</span> burak.service — {profile.role}</div>
+          <dl class="status-grid">
+            <dt>Loaded:</dt>
+            <dd>loaded (<span class="muted">/etc/systemd/system/burak.service</span>; enabled)</dd>
+            <dt>Active:</dt>
+            <dd><span class="c-green bold">active (running)</span> — {profile.status}</dd>
+            <dt>Docs:</dt>
+            <dd>man burak</dd>
+          </dl>
+          <div class="term-cursor" aria-hidden="true"><span class="c-blue">~</span> <span class="c-green">❯</span><span class="cursor"></span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="about" class="section" aria-labelledby="about-title">
+      <SectionHead id="about" title="ABOUT" cmd="cat about.md" />
+      <div class="about indent">
+        {profile.about.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <SectionHead id="projects" title="PROJECTS" cmd="ls -l ~/projects" />
+      <div class="ls indent">
+        <div class="ls-total" aria-hidden="true">total {projects.length}</div>
+        <div class="ls-row ls-head" aria-hidden="true">
+          <span>MODE</span><span>NAME</span><span>DESCRIPTION</span><span>TAGS</span>
+        </div>
+        <ul class="ls-list" role="list">
+          {
+            projects.map((p) => {
+              const label = p.kind === 'dir' ? `${p.name}/` : p.name;
+              return (
+                <li class="ls-row">
+                  <span class="muted" aria-hidden="true">{p.kind === 'dir' ? 'drwxr-xr-x' : '-rwxr-xr-x'}</span>
+                  {p.url ? (
+                    <a class="ls-name" href={p.url} {...(isExternal(p.url) ? { rel: 'noopener' } : {})}>{label}</a>
+                  ) : (
+                    <span class="ls-name">{label}</span>
+                  )}
+                  <p class="ls-desc">{p.description}</p>
+                  <ul class="tag-list">{p.tags.map((t) => <li class="tag">{t}</li>)}</ul>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="experience" class="section" aria-labelledby="experience-title">
+      <SectionHead id="experience" title="EXPERIENCE" cmd="git log --career" />
+      <ol class="timeline" role="list">
+        {
+          experience.map((e) => (
+            <li class:list={['commit', { 'is-head': e.ref?.startsWith('HEAD'), 'is-edu': e.kind === 'education' }]}>
+              <span class="commit-dot" aria-hidden="true" />
+              <div class="commit-hash" aria-hidden="true">
+                commit {shortHash(`${e.org}:${e.start}`)}
+                {e.ref && <span class="muted">({e.ref})</span>}
+              </div>
+              <div class="commit-title">
+                <h3>
+                  {e.role} ·{' '}
+                  {e.url ? (
+                    <a href={e.url} rel="noopener">{e.org}</a>
+                  ) : (
+                    e.org
+                  )}
+                </h3>
+                <span class="commit-date">
+                  <time datetime={e.start}>{monthLabel(e.start)}</time> — {e.end ? <time datetime={e.end}>{monthLabel(e.end)}</time> : 'present'}
+                </span>
+              </div>
+              {e.note && <p class="commit-note">{e.note}</p>}
+              {e.highlights.length > 0 && (
+                <ul class="diff" role="list">
+                  {e.highlights.map((h) => <li>{h}</li>)}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="skills" class="section" aria-labelledby="skills-title">
+      <SectionHead id="skills" title="SKILLS" cmd="cat ~/.config/burak/skills.conf" />
+      <div class="conf">
+        <pre>{skills.comment && <span class="muted"># {skills.comment}{'\n'}</span>}{
+          skills.groups.map((g, gi) => (
+            <>{gi > 0 && '\n'}<span class="c-blue">[{g.name}]</span>{'\n'}{g.items.map((i) => (
+              <>{i.key.padEnd(keyWidth)} = <span class={i.key === 'os' ? 'c-green' : 'c-amber'}>{i.value}</span>{i.comment && <>  <span class="muted"># {i.comment}</span></>}{'\n'}</>
+            ))}</>
+          ))
+        }</pre>
+      </div>
+    </section>
+
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <SectionHead id="contact" title="CONTACT" cmd="cat contact.txt" />
+      <div class="contact indent">
+        <div class="contact-cta">
+          <p>{profile.contactHeadline}</p>
+          <div class="btn-row">
+            <a class="btn btn-primary" href={mailto}>mail burak</a>
+            {
+              profile.resume && (
+                <a class="btn btn-icon" href={profile.resume} download={cvFileName}>
+                  CV PDF
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 4v11" /><path d="m7 10 5 5 5-5" /><path d="M5 20h14" />
+                  </svg>
+                </a>
+              )
+            }
+          </div>
+        </div>
+        <ul class="contact-list" role="list">
+          <li><a href={mailto}><span>email</span><span>{profile.email}</span></a></li>
+          {
+            profile.social.map((s) => (
+              <li>
+                <a href={s.url} rel="me noopener"><span>{s.key}</span><span>{s.label}</span></a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+</Base>

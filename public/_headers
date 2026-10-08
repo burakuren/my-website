@@ -1,0 +1,28 @@
+# Cloudflare Workers static assets headers
+# https://developers.cloudflare.com/workers/static-assets/headers/
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# Hashed build output never changes.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The OAuth sign-in popup talks back to this page via window.opener.
+/admin/*
+  ! Cross-Origin-Opener-Policy
+  Cache-Control: no-cache
+
+# Always download (never open inline) under a readable file name, and keep
+# the CV, which includes a phone number, out of search results.
+/cv.pdf
+  X-Robots-Tag: noindex
+  Content-Disposition: attachment; filename="Burak_Uren_CV.pdf"
+
+/rss.xml
+  Content-Type: application/rss+xml; charset=utf-8

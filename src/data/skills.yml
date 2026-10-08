@@ -1,0 +1,27 @@
+comment: what I reach for
+groups:
+  - name: backend
+    items:
+      - key: languages
+        value: python, sql
+      - key: frameworks
+        value: django, drf, flask, sqlalchemy, celery, htmx
+      - key: data
+        value: postgresql, redis, rabbitmq, pandas
+      - key: concepts
+        value: rest apis, microservices, caching, rbac, jwt/oauth, stripe
+  - name: ops
+    items:
+      - key: infra
+        value: docker, kubernetes, aws, digitalocean
+      - key: web
+        value: caddy, nginx
+      - key: delivery
+        value: github actions, jenkins
+      - key: observability
+        value: grafana, loki
+      - key: quality
+        value: pytest, factory-boy, mypy, black, flake8
+      - key: os
+        value: linux
+        comment: daily driver

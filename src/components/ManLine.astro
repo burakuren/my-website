@@ -1,0 +1,11 @@
+---
+interface Props {
+  page: string;
+  title: string;
+}
+const { page, title } = Astro.props;
+---
+
+<div class="man-line" aria-hidden="true">
+  <span>{page}</span><span>{title}</span><span>{page}</span>
+</div>

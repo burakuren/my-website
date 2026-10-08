@@ -1,0 +1,77 @@
+name: Burak Üren
+handle: burakuren
+role: Backend Software Engineer
+tagline: backend software engineer
+seoTitle: Burak Üren — Backend Software Engineer (Python, Django, DevOps)
+seoDescription: Backend software engineer in Istanbul. I build REST APIs, microservices and payment systems with Python, Django and Flask, and run them on Linux, Docker and Kubernetes.
+synopsis:
+  - flag: --build
+    arg: apis
+  - flag: --ship
+    arg: infra
+  - flag: --keep
+    arg: it-running
+description: >-
+  I'm a backend software engineer with 3+ years of building REST APIs,
+  microservices and payment-integrated systems in Python, mostly with Django
+  and Flask. I also run what I build: Docker, Kubernetes, CI/CD and the Linux
+  servers underneath. Linux is home; most of my day happens in a terminal.
+  Right now I'm building a referral platform for MatFabe and running
+  BanaDersBul, the tutoring marketplace I founded.
+about:
+  - >-
+    I got into backend work by building my own product. In 2021 I launched
+    BanaDersBul, a marketplace that connects private tutors with students, and
+    I've run it end to end ever since (API, database, servers and deploys) as
+    it grew past 4,500 users. From 2022 to 2025 I was a backend developer at
+    SMGrader, an AI-powered grading platform, working on its Django REST API,
+    Celery and RabbitMQ microservices, Stripe billing and AWS infrastructure.
+  - >-
+    I work test-first with pytest, in small reviewed changes, behind CI/CD that
+    makes deploys boring. I care about caching and query performance, logs you
+    can actually search, and infrastructure that's no more complex than it needs
+    to be. I once moved BanaDersBul off Kubernetes onto a single hardened server
+    and cut the bill. I studied Mathematics and Computer Science at Istanbul
+    Kültür University, where I also ran Linux community events.
+status: open to work
+fetch:
+  - key: role
+    value: backend software engineer
+  - key: focus
+    value: backend · devops · linux
+  - key: os
+    value: openSUSE Tumbleweed
+  - key: shell
+    value: bash
+  - key: stack
+    value: python · django · postgres
+  - key: location
+    value: istanbul, turkey
+location:
+  city: Istanbul
+  country: Turkey
+email: contact@burakuren.com
+contactHeadline: Have a system that needs building, or one that keeps paging you at 3am? Let's talk.
+social:
+  - key: github
+    label: github.com/burakuren
+    url: https://github.com/burakuren
+  - key: linkedin
+    label: linkedin.com/in/burakuren
+    url: https://www.linkedin.com/in/burakuren/
+resume: /cv.pdf
+knowsAbout:
+  - Python
+  - Django
+  - Django REST Framework
+  - Flask
+  - PostgreSQL
+  - Redis
+  - RabbitMQ
+  - Celery
+  - Docker
+  - Kubernetes
+  - AWS
+  - CI/CD
+  - Linux
+alumniOf: Istanbul Kültür University
