@@ -5,7 +5,7 @@ pubDate: 2026-09-14
 tags:
   - linux
   - devops
-draft: true
+draft: false
 ---
 
 ## The problem
