@@ -6,7 +6,7 @@ tags:
   - linux
   - devops
 cover: lotr-1.jpg
-draft: false
+draft: true
 ---
 
 ## The problem
