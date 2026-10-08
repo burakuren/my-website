@@ -8,7 +8,7 @@ import { figureFromTitle } from './src/lib/satteri-figure.mjs';
 import { SITE_URL } from './src/site.config.mjs';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { THEME_INIT } from './src/lib/theme-init.mjs';
+import { HEAD_INIT } from './src/lib/head-init.mjs';
 
 // The blog index is `noindex` until the first post is published, so keep it
 // out of the sitemap too (Search Console flags noindex URLs in sitemaps).
@@ -46,7 +46,7 @@ export default defineConfig({
       ],
       scriptDirective: {
         resources: ["'self'", 'https://static.cloudflareinsights.com'],
-        hashes: [`sha256-${createHash('sha256').update(THEME_INIT).digest('base64')}`],
+        hashes: [`sha256-${createHash('sha256').update(HEAD_INIT).digest('base64')}`],
       },
       styleDirective: {
         resources: ["'self'", "'unsafe-inline'"],
@@ -86,7 +86,7 @@ export default defineConfig({
     syntaxHighlight: 'shiki',
     shikiConfig: {
       // Colours come from CSS custom properties, so code blocks follow the
-      // site's dark/light theme without shipping two sets of inline styles.
+      // site's tokens without hard-coding colours into inline styles.
       theme: 'css-variables',
       wrap: false,
       transformers: [codeBlockHeader()],

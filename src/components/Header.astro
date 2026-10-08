@@ -21,37 +21,37 @@ const links = [
     <a href="/" class="prompt" {...(section === 'home' ? { 'aria-current': 'page' } : {})}>
       <span class="c-green">burak@burakuren</span><span class="muted">:</span><span class="c-blue">{cwd}</span><span class="muted">$</span><span class="cursor" aria-hidden="true"></span><span class="visually-hidden"> (home)</span>
     </a>
-    <nav class="site-nav" aria-label="Main">
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path class="open" d="M4 7h16M4 12h16M4 17h16" /><path class="close" d="M6 6l12 12M18 6 6 18" />
+      </svg>
+      <span>menu</span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main">
       {links.map((l) => <a href={l.href} {...(l.current ? { 'aria-current': 'page' } : {})}>{l.label}</a>)}
-      <div class="theme-toggle" role="group" aria-label="Color theme">
-        <button type="button" data-set-theme="dark" aria-pressed="true">dark</button>
-        <button type="button" data-set-theme="light" aria-pressed="false">light</button>
-      </div>
     </nav>
   </div>
 </header>
 
 <script>
-  const root = document.documentElement;
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-set-theme]');
-  const current = () => root.dataset.theme ?? 'dark';
+  // Small screens collapse the nav behind a toggle; without JS it stays visible.
+  const header = document.querySelector<HTMLElement>('.site-header')!;
+  const toggle = header.querySelector<HTMLButtonElement>('.nav-toggle')!;
 
-  function sync() {
-    const theme = current();
-    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setTheme === theme)));
-    const color = theme === 'light' ? '#f3f1ea' : '#15171c';
-    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
+  function setOpen(open: boolean) {
+    toggle.setAttribute('aria-expanded', String(open));
+    header.classList.toggle('is-open', open);
   }
 
-  buttons.forEach((b) =>
-    b.addEventListener('click', () => {
-      const theme = b.dataset.setTheme!;
-      root.dataset.theme = theme;
-      try {
-        localStorage.setItem('theme', theme);
-      } catch {}
-      sync();
-    }),
-  );
-  sync();
+  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  header.querySelectorAll('.site-nav a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('click', (e) => {
+    if (!header.contains(e.target as Node)) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.classList.contains('is-open')) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
 </script>

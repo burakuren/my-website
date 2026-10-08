@@ -20,7 +20,8 @@ npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 
 - Design lives in Claude Design exports under `design/` (gitignored, local only). They are self-extracting bundles; read them with `python3 -I scripts/unpack-design.py "design/<file>.html" <out-dir>`. Each board becomes a folder; markup uses `{{c.*}}` placeholders and the colours/data/embedded images are in the board's `text/x-dc` script.
 - Visual language: Linux terminal + man pages + git (`UREN(1)` running headers, `$ cat about.md` section commands, `ls -l` projects, `git log` experience, `.conf` skills, `~ ❯` prompts). Keep new UI and copy in that voice.
-- Theme tokens are CSS custom properties in `src/styles/global.css`. Dark is the default regardless of OS preference; light only via the toggle (`[data-theme]`, stored in localStorage). Colours must come from tokens, not literals.
+- Theme tokens are CSS custom properties in `src/styles/global.css`. The site is dark only (the light theme and its toggle were removed on purpose). Colours must come from tokens, not literals.
+- Responsive layout: at <=760px the header is one sticky row with a `menu` toggle (nav drops down as `cd ./about` rows; without JS the links just wrap). The hero is two columns only at >=1080px; below that the photo sits beside the name (first screen on phones) and the photo inside the terminal card is hidden. Both `<Avatar size={152}>` share URLs, so only one download. Hover colour changes are wrapped in `@media (hover: hover)` so tapped links don't stay lit on touch screens.
 - The user's real photo (`src/assets/burak.jpg`, rendered via `src/components/Avatar.astro` as AVIF/WebP/JPEG) replaced the design's ASCII portrait everywhere. Don't reintroduce ASCII art for him.
 
 ## Content model
@@ -43,7 +44,7 @@ npm run deploy:www # www → apex redirect Worker (workers/www-redirect)
 ## Astro 7 gotchas hit in this project
 
 - `compressHTML: true` is set on purpose. Astro 7's default `'jsx'` strips whitespace between inline elements and breaks the terminal markup (`<span>~</span> <span>❯</span>`).
-- CSP is Astro's `security.csp` (a `<meta>` tag with hashes). The inline theme script is hashed from `src/lib/theme-init.mjs`; edit it only there. Styles need `'unsafe-inline'` because Shiki uses style attributes, so the build warns "Shiki ... not compatible with CSP". That warning is expected. The Cloudflare Web Analytics beacon is allowlisted in `script-src`/`connect-src`.
+- CSP is Astro's `security.csp` (a `<meta>` tag with hashes). The inline head script (adds `.js` to `<html>` before paint) is hashed from `src/lib/head-init.mjs`; edit it only there. Styles need `'unsafe-inline'` because Shiki uses style attributes, so the build warns "Shiki ... not compatible with CSP". That warning is expected. The Cloudflare Web Analytics beacon is allowlisted in `script-src`/`connect-src`.
 - A global `[hidden] { display: none !important; }` exists because components set `display: flex` and progressive-enhancement JS toggles `hidden`.
 - `.wrap` needs `width: 100%`: `main` is a flex item of a column flexbox, and auto margins otherwise shrink it to content width.
 - Zod 4: use `z.url()` / `z.email()`, not `z.string().url()`.

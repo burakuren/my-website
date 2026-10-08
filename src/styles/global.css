@@ -1,11 +1,9 @@
 /* ==========================================================================
    Tokens
-   Dark is the default regardless of OS preference. A stored choice sets
-   [data-theme] on <html> before first paint.
+   The site is dark only.
    ========================================================================== */
 
-:root,
-:root[data-theme='dark'] {
+:root {
   color-scheme: dark;
   --bg: #15171c;
   --panel: #1b1e25;
@@ -17,20 +15,6 @@
   --blue: #90b4da;
   --dot: #2a2f39;
   --shadow: rgba(0, 0, 0, 0.55);
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
-  --bg: #f3f1ea;
-  --panel: #faf8f2;
-  --line: #d9d4c7;
-  --text: #1d2127;
-  --muted: #555c66;
-  --green: #2f6a2c;
-  --amber: #8a5300;
-  --blue: #2b5987;
-  --dot: #d3cdbf;
-  --shadow: rgba(60, 50, 30, 0.22);
 }
 
 :root {
@@ -259,51 +243,125 @@ samp {
   display: flex;
   align-items: center;
 }
-.site-nav a:hover {
-  color: var(--text);
-}
 .site-nav a[aria-current] {
   color: var(--text);
   box-shadow: inset 0 -2px 0 var(--green);
 }
 
-.theme-toggle {
-  display: none;
-  margin-left: 12px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.js .theme-toggle {
-  display: flex;
-}
-.theme-toggle button {
-  font: inherit;
-  font-size: 13px;
-  border: 0;
-  padding: 0 14px;
-  min-height: 44px;
-  cursor: pointer;
-  background: transparent;
-  color: var(--muted);
-}
-.theme-toggle button[aria-pressed='true'] {
-  background: var(--text);
-  color: var(--bg);
+/* Hover colours only where there is a real pointer: on touch screens :hover
+   sticks to the last tapped element and keeps it lit. */
+@media (hover: hover) {
+  .site-nav a:hover,
+  .nav-toggle:hover {
+    color: var(--text);
+  }
 }
 
-@media (max-width: 640px) {
-  .site-nav {
+.nav-toggle {
+  display: none;
+}
+
+/* Small screens: one compact sticky row; the nav drops down from the header. */
+@media (max-width: 760px) {
+  :root {
+    --header-h: 61px;
+  }
+  html {
+    scroll-padding-top: var(--header-h);
+  }
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  .site-header .wrap {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+  .prompt {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .js .nav-toggle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .nav-toggle .close,
+  .is-open .nav-toggle .open {
+    display: none;
+  }
+  .is-open .nav-toggle .close {
+    display: inline;
+  }
+  .is-open .nav-toggle {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+  .js .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 4px var(--gutter) 12px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 18px 32px -18px var(--shadow);
+  }
+  .js .is-open .site-nav {
+    display: flex;
+  }
+  .js .site-nav a {
+    padding: 0;
+    min-height: 48px;
+    font-size: 15px;
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+  }
+  .js .site-nav a:last-child {
+    border-bottom: 0;
+  }
+  .js .site-nav a::before {
+    content: 'cd ';
+    white-space: pre;
+    color: var(--muted);
+  }
+  .js .site-nav a[aria-current] {
+    box-shadow: none;
+    color: var(--green);
+  }
+}
+
+/* No JS on a small screen: the links simply wrap under the prompt. */
+@media (max-width: 760px) {
+  html:not(.js) .site-header .wrap {
+    flex-wrap: wrap;
+  }
+  html:not(.js) .site-nav {
     width: calc(100% + 16px);
     margin: 0 -8px;
     gap: 0;
   }
-  .site-nav a {
+  html:not(.js) .site-nav a {
     padding: 0 8px;
     font-size: 13px;
-  }
-  .theme-toggle {
-    margin-left: auto;
   }
 }
 
@@ -331,6 +389,12 @@ samp {
   font-family: var(--mono);
   font-size: 13px;
   color: var(--muted);
+}
+@media (max-width: 640px) {
+  .man-line {
+    padding: 16px 0 0;
+    font-size: 12px;
+  }
 }
 @media (max-width: 480px) {
   .man-line > :nth-child(2) {
@@ -419,11 +483,10 @@ a.tag:hover {
 
 .hero {
   display: flex;
-  flex-wrap: wrap;
-  gap: 56px;
+  flex-direction: column;
+  gap: 48px;
   margin: 0 calc(var(--gutter) * -1);
-  padding: 56px var(--gutter) 88px;
-  align-items: center;
+  padding: 40px var(--gutter) 72px;
   background-color: var(--bg);
   background-image:
     linear-gradient(to bottom, transparent 55%, var(--bg)),
@@ -436,11 +499,52 @@ a.tag:hover {
 }
 
 .hero-copy {
-  flex: 999 1 480px;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+/* Copy and terminal side by side only when both fit; below that the terminal
+   stacks under the copy and the photo moves up beside the name. */
+@media (min-width: 1080px) {
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    gap: 56px;
+    padding: 56px var(--gutter) 88px;
+  }
+  .hero-copy {
+    flex: 1 1 480px;
+  }
+  .terminal {
+    flex: 1 1 520px;
+  }
+  .hero-id picture {
+    display: none;
+  }
+}
+@media (max-width: 1079.98px) {
+  .term-fetch .photo {
+    display: none;
+  }
+}
+
+.hero-id {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.hero-id picture {
+  flex: none;
+}
+.hero-id .avatar {
+  display: block;
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--panel);
 }
 
 .hero-block {
@@ -457,6 +561,11 @@ a.tag:hover {
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--text);
+}
+@media (min-width: 1080px) {
+  .hero-name {
+    font-size: min(76px, 5.4vw);
+  }
 }
 .hero-name .cursor {
   width: 0.09em;
@@ -486,9 +595,37 @@ a.tag:hover {
   line-height: 1.65;
 }
 
+@media (max-width: 640px) {
+  .hero {
+    gap: 40px;
+    padding: 24px var(--gutter) 56px;
+  }
+  .hero-copy {
+    gap: 22px;
+  }
+  .hero-id {
+    gap: 16px;
+  }
+  .hero-id .avatar {
+    width: 120px;
+    height: 120px;
+  }
+  /* Two lines beside the photo on phones. */
+  .hero-name {
+    font-size: clamp(34px, 10vw, 46px);
+  }
+  .hero-tagline {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .hero-desc {
+    font-size: 17px;
+  }
+}
+
 /* Terminal window */
 .terminal {
-  flex: 1 1 520px;
   min-width: 0;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -605,6 +742,7 @@ a.tag:hover {
 }
 .status-grid dd {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .term-cursor {
@@ -628,6 +766,9 @@ a.tag:hover {
   }
   .status-grid {
     grid-template-columns: 64px minmax(0, 1fr);
+  }
+  .unit-path {
+    display: none;
   }
 }
 
@@ -844,10 +985,23 @@ a.ls-name:hover {
   line-height: 2;
   white-space: pre;
 }
+/* Narrow screens wrap long values instead of scrolling sideways; each line
+   hangs past "key = " so wrapped values stay in their column. */
 @media (max-width: 640px) {
+  .conf {
+    margin-left: 0;
+  }
   .conf pre {
     font-size: 13px;
+    line-height: 1.75;
     padding: 16px;
+    white-space: pre-wrap;
+  }
+  .conf-line {
+    display: inline-block;
+    width: 100%;
+    padding: 2px 0 2px var(--hang);
+    text-indent: calc(var(--hang) * -1);
   }
 }
 
@@ -901,6 +1055,17 @@ a.ls-name:hover {
 }
 .contact-list span:last-child {
   overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .contact-list {
+    font-size: 14px;
+  }
+  .contact-list span:first-child {
+    width: 76px;
+  }
+  .contact-cta p {
+    font-size: 20px;
+  }
 }
 
 /* ==========================================================================
@@ -1010,8 +1175,10 @@ a.ls-name:hover {
   background: transparent;
   color: var(--muted);
 }
-.tag-filter button:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .tag-filter button:hover {
+    color: var(--text);
+  }
 }
 .tag-filter button[aria-pressed='true'] {
   background: var(--text);
@@ -1256,8 +1423,10 @@ a.ls-name:hover {
   display: flex;
   gap: 2ch;
 }
-.toc a:hover {
-  color: var(--green);
+@media (hover: hover) {
+  .toc a:hover {
+    color: var(--green);
+  }
 }
 .toc a span {
   color: var(--muted);
@@ -1464,8 +1633,10 @@ a.ls-name:hover {
   min-height: 40px;
   padding: 0 10px;
 }
-.code-copy:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .code-copy:hover {
+    color: var(--text);
+  }
 }
 .code-copy.is-copied {
   color: var(--green);
@@ -1549,8 +1720,10 @@ a.ls-name:hover {
   display: flex;
   align-items: center;
 }
-.post-foot a:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .post-foot a:hover {
+    color: var(--text);
+  }
 }
 
 .author {
@@ -1697,10 +1870,15 @@ a.ls-name:hover {
   font-size: 13px;
   text-decoration: none;
 }
-.to-top:hover,
 .to-top:focus-visible {
   color: var(--text);
   border-color: var(--muted);
+}
+@media (hover: hover) {
+  .to-top:hover {
+    color: var(--text);
+    border-color: var(--muted);
+  }
 }
 .js .to-top:not(.is-visible) {
   opacity: 0;
@@ -1720,11 +1898,14 @@ a.ls-name:hover {
     right: 16px;
     bottom: 16px;
   }
+  /* Room for the back-to-top button at the very end of the page. */
+  .site-footer .wrap {
+    padding-bottom: 76px;
+  }
 }
 
 @media print {
   .site-header,
-  .theme-toggle,
   .to-top,
   .terminal,
   .code-copy,

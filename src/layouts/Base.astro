@@ -6,7 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
 import { SITE_NAME } from '../site.config.mjs';
-import { THEME_INIT } from '../lib/theme-init.mjs';
+import { HEAD_INIT } from '../lib/head-init.mjs';
 
 interface Props {
   title: string;
@@ -50,7 +50,7 @@ const social = Object.fromEntries(profile.social.map((s) => [s.key, s.url]));
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline set:html={THEME_INIT} />
+    <script is:inline set:html={HEAD_INIT} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

@@ -68,9 +68,14 @@ const jsonLd = [
       <div class="hero-copy">
         <div class="hero-block">
           <p class="label" aria-hidden="true">NAME</p>
-          <div class="indent">
-            <h1 class="hero-name" id="name">{profile.name}<span class="cursor blink" aria-hidden="true"></span></h1>
-            <p class="hero-tagline">- {profile.tagline}</p>
+          <div class="hero-id indent">
+            {/* Shown while the terminal card is stacked below the copy, so the
+                photo is on the first screen; same image URL as the card's. */}
+            <Avatar size={152} alt={`Photo of ${profile.name}`} eager />
+            <div>
+              <h1 class="hero-name" id="name">{profile.name}<span class="cursor blink" aria-hidden="true"></span></h1>
+              <p class="hero-tagline">- {profile.tagline}</p>
+            </div>
           </div>
         </div>
         <div class="hero-block">
@@ -125,7 +130,7 @@ const jsonLd = [
           <div><span class="c-green">●</span> burak.service - {profile.role}</div>
           <dl class="status-grid">
             <dt>Loaded:</dt>
-            <dd>loaded (<span class="muted">/etc/systemd/system/burak.service</span>; enabled)</dd>
+            <dd>loaded (<span class="unit-path"><span class="muted">/etc/systemd/system/burak.service</span>; </span>enabled)</dd>
             <dt>Active:</dt>
             <dd><span class="c-green bold">active (running)</span>; {profile.status}</dd>
             <dt>Docs:</dt>
@@ -211,10 +216,10 @@ const jsonLd = [
     <section id="skills" class="section" aria-labelledby="skills-title">
       <SectionHead id="skills" title="SKILLS" cmd="cat ~/.config/burak/skills.conf" />
       <div class="conf">
-        <pre>{skills.comment && <span class="muted"># {skills.comment}{'\n'}</span>}{
+        <pre style={`--hang: ${keyWidth + 3}ch`}>{skills.comment && <span class="muted"># {skills.comment}{'\n'}</span>}{
           skills.groups.map((g, gi) => (
             <>{gi > 0 && '\n'}<span class="c-blue">[{g.name}]</span>{'\n'}{g.items.map((i) => (
-              <>{i.key.padEnd(keyWidth)} = <span class={i.key === 'os' ? 'c-green' : 'c-amber'}>{i.value}</span>{i.comment && <>  <span class="muted"># {i.comment}</span></>}{'\n'}</>
+              <><span class="conf-line">{i.key.padEnd(keyWidth)} = <span class={i.key === 'os' ? 'c-green' : 'c-amber'}>{i.value}</span>{i.comment && <>  <span class="muted"># {i.comment}</span></>}</span>{'\n'}</>
             ))}</>
           ))
         }</pre>
