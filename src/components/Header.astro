@@ -1,6 +1,6 @@
 ---
 interface Props {
-  section: 'home' | 'blog' | 'lab' | 'none';
+  section: 'home' | 'blog' | 'none';
   cwd: string;
 }
 
@@ -12,8 +12,6 @@ const links = [
   { href: `${base}#projects`, label: './projects' },
   { href: `${base}#experience`, label: './experience' },
   { href: '/blog/', label: './blog', current: section === 'blog' },
-  // Lab: temporary Sveltia CMS playground.
-  { href: '/lab/', label: './lab', current: section === 'lab' },
   { href: `${base}#contact`, label: './contact' },
 ];
 ---

@@ -7,8 +7,6 @@ import Avatar from '../../components/Avatar.astro';
 import { getPosts, postUrl, type Post } from '../../lib/posts';
 import { isoDate, readingMinutes } from '../../lib/format';
 import { SITE_URL } from '../../site.config.mjs';
-import '../../styles/lab.css';
-import { categoryUrl } from '../../lib/lab';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
@@ -29,9 +27,6 @@ const { post, older, newer } = Astro.props;
 const { Content, headings } = await render(post);
 const profile = (await getEntry('profile', 'profile'))!.data;
 const { title, description, pubDate, updatedDate, tags, cover, coverAlt } = post.data;
-
-// Lab: resolve the Relation field to the category entry.
-const category = post.data.category && (await getEntry(post.data.category));
 
 const toc = headings.filter((h) => h.depth === 2);
 const minutes = readingMinutes(post.body ?? '');
@@ -95,7 +90,6 @@ const jsonLd = [
     <header class="post-header">
       <div class="post-header-meta">
         <time datetime={pubDate.toISOString()}>{isoDate(pubDate)}</time><span aria-hidden="true">·</span><span>{minutes} min read</span>
-        {category && <><span aria-hidden="true">·</span><a class="tag" href={categoryUrl(category.id)} style={`--accent: ${category.data.color}`}><span class="dot" />{category.data.name}</a></>}
         {tags.length > 0 && <span aria-hidden="true">·</span>}
         {tags.map((t) => <a class="tag" href={`/blog/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
         {post.data.draft && <span class="c-amber">(draft, not published)</span>}

@@ -1,8 +1,0 @@
-en:
-  term: Socket activation
-  definition: systemd holds the listening socket and starts the service on the first connection.
-  category: linux
-tr:
-  term: Soket aktivasyonu
-  definition: systemd dinleyen soketi tutar ve servisi ilk bağlantıda başlatır.
-  category: linux

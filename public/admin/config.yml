@@ -30,12 +30,6 @@ slug:
 output:
   omit_empty_optional_fields: true
 
-# Lab: only the glossary opts in (`i18n: true`); everything else stays English only.
-i18n:
-  structure: single_file
-  locales: [en, tr]
-  default_locale: en
-
 collections:
   - name: blog
     label: Blog
@@ -66,12 +60,6 @@ collections:
       - label: Drafts
         field: draft
         pattern: true
-    view_groups:
-      - label: Category
-        field: category
-      - label: Year
-        field: pubDate
-        pattern: '\d{4}'
     fields:
       - name: title
         label: Title
@@ -103,14 +91,6 @@ collections:
         required: false
         options: [backend, devops, linux, python, django, databases, notes]
         hint: Add new tags to this list in public/admin/config.yml.
-      - name: category
-        label: Category
-        widget: relation
-        collection: lab_categories
-        value_field: '{{slug}}'
-        display_fields: [name]
-        required: false
-        hint: 'Lab: picks from the Categories collection.'
       - name: cover
         label: Cover image
         widget: image
@@ -129,150 +109,6 @@ collections:
         label: Body
         widget: markdown
         hint: 'Code fences take a title: ```ini title="api.socket". Callouts: > [!NOTE]. Image captions come from the image title.'
-
-  # ------------------------------------------------------------------
-  # Lab: throwaway collections that exercise Sveltia features. /lab/
-  # ------------------------------------------------------------------
-  - divider: true
-
-  # Categories as their own collection, referenced by notes and the glossary.
-  - name: lab_categories
-    label: Categories
-    label_singular: Category
-    icon: category
-    description: Referenced from notes via a Relation field. Drag to reorder (writes `order`).
-    folder: src/content/lab/categories
-    extension: yml
-    format: yaml
-    identifier_field: name
-    slug: '{{name}}'
-    reorder: true
-    thumbnail: icon
-    preview_path: /lab/c/{{slug}}/
-    summary: '{{name}} · {{description | truncate(40)}}'
-    fields:
-      - { name: name, label: Name, widget: string }
-      - { name: description, label: Description, widget: text, required: false }
-      - { name: color, label: Colour, widget: color, allowInput: true, default: '#97c58e' }
-      - { name: icon, label: Icon, widget: image, required: false, hint: Shown as the thumbnail in the entry list. }
-
-  # One folder, two CMS collections: the full notes view, and a filtered
-  # "Links" view that only sees (and creates) entries with kind: link.
-  - name: lab_notes
-    label: Notes
-    label_singular: Note
-    icon: sticky_note_2
-    description: Grouped by category, kind or year; filter by pinned, kind or rating.
-    folder: src/content/lab/notes
-    extension: md
-    format: frontmatter
-    preview_path: /lab/notes/{{slug}}/
-    summary: '{{date | date("YYYY-MM-DD")}} · [{{kind | upper}}] {{title}}'
-    sortable_fields:
-      fields: [date, title, rating]
-      default: { field: date, direction: descending }
-    view_groups:
-      default: category
-      groups:
-        - { name: category, label: Category, field: category }
-        - { name: kind, label: Kind, field: kind }
-        - { name: year, label: Year, field: date, pattern: '\d{4}' }
-    view_filters:
-      filters:
-        - { name: pinned, label: Pinned, field: pinned, pattern: true }
-        - { name: til, label: TIL, field: kind, eq: til }
-        - { name: snippets, label: Snippets, field: kind, eq: snippet }
-        - { name: favourites, label: '4+ stars', field: rating, gte: 4 }
-    fields:
-      - { name: title, label: Title, widget: string }
-      - name: kind
-        label: Kind
-        widget: select
-        options:
-          - { label: Today I learned, value: til }
-          - { label: Snippet, value: snippet }
-          - { label: Link, value: link }
-        default: til
-      - name: category
-        label: Category
-        widget: relation
-        collection: lab_categories
-        value_field: '{{slug}}'
-        display_fields: [name]
-        search_fields: [name]
-      - { name: tags, label: Tags, widget: list, required: false, hint: Comma separated. }
-      - { name: date, label: Date, widget: datetime, type: date, format: YYYY-MM-DD, default: '{{now}}' }
-      - { name: url, label: URL, widget: string, type: url, required: false }
-      - { name: rating, label: Rating, widget: number, value_type: int, min: 1, max: 5, required: false, after_input: '/ 5' }
-      - { name: pinned, label: Pinned, widget: boolean, default: false }
-      - { name: body, label: Body, widget: richtext }
-
-  - name: lab_links
-    label: Links (filtered)
-    label_singular: Link
-    icon: link
-    description: Same folder as Notes, filtered to kind = link. New entries get kind = link from a hidden field.
-    folder: src/content/lab/notes
-    extension: md
-    format: frontmatter
-    filter: { field: kind, value: link }
-    preview_path: /lab/notes/{{slug}}/
-    summary: '{{title}} → {{url}}'
-    fields:
-      - { name: title, label: Title, widget: string }
-      - { name: kind, label: Kind, widget: hidden, default: link }
-      - name: category
-        label: Category
-        widget: relation
-        collection: lab_categories
-        value_field: '{{slug}}'
-        display_fields: [name]
-      - { name: url, label: URL, widget: string, type: url }
-      - { name: tags, label: Tags, widget: list, required: false }
-      - { name: date, label: Date, widget: datetime, type: date, format: YYYY-MM-DD, default: '{{now}}' }
-      - { name: rating, label: Rating, widget: number, value_type: int, min: 1, max: 5, required: false }
-      - { name: pinned, label: Pinned, widget: boolean, default: false }
-      - { name: body, label: Why it's worth reading, widget: richtext, required: false }
-
-  # Nested collection: a folder tree up to three levels deep.
-  - name: lab_docs
-    label: Docs (nested)
-    label_singular: Doc
-    icon: account_tree
-    description: A folder tree. Create sub-folders and move pages between them.
-    folder: src/content/lab/docs
-    extension: md
-    format: frontmatter
-    nested: { depth: 3, subfolders: false }
-    meta: { path: { label: Folder } }
-    sortable_fields: [weight, title]
-    fields:
-      - { name: title, label: Title, widget: string }
-      - { name: weight, label: Sort weight, widget: number, value_type: int, default: 0 }
-      - { name: body, label: Body, widget: richtext }
-
-  # i18n: one YAML file per term holding both languages (single_file).
-  - name: lab_glossary
-    label: Glossary (en/tr)
-    label_singular: Term
-    icon: translate
-    description: Translated entries. Switch locales in the editor; the category is copied across.
-    folder: src/content/lab/glossary
-    extension: yml
-    format: yaml
-    identifier_field: term
-    i18n: true
-    fields:
-      - { name: term, label: Term, widget: string, i18n: true }
-      - { name: definition, label: Definition, widget: text, i18n: true }
-      - name: category
-        label: Category
-        widget: relation
-        collection: lab_categories
-        value_field: '{{slug}}'
-        display_fields: [name]
-        required: false
-        i18n: duplicate
 
 singletons:
   - name: profile
@@ -332,7 +168,7 @@ singletons:
       - name: projects
         label: Projects
         widget: list
-        summary: '{{fields.name}} · {{fields.category}}'
+        summary: '{{fields.name}}'
         fields:
           - { name: name, label: Name, widget: string }
           - name: kind
@@ -345,13 +181,6 @@ singletons:
           - { name: url, label: URL, widget: string, required: false }
           - { name: description, label: Description, widget: text }
           - { name: tags, label: Tags, widget: list, required: false }
-          - name: category
-            label: Category
-            widget: relation
-            collection: lab_categories
-            value_field: '{{slug}}'
-            display_fields: [name]
-            required: false
 
   - name: experience
     label: Experience
@@ -399,85 +228,3 @@ singletons:
               - { name: key, label: Key, widget: string }
               - { name: value, label: Value, widget: string }
               - { name: comment, label: Comment, widget: string, required: false }
-
-  - name: lab_widgets
-    label: 'Lab: every field type'
-    icon: widgets
-    file: src/data/lab-widgets.yml
-    preview_path: /lab/widgets/
-    fields:
-      - { name: uuid, label: UUID, widget: uuid, comment: Generated once and never edited. }
-      - { name: title, label: String, widget: string, maxlength: 60 }
-      - { name: slug, label: String with pattern, widget: string, pattern: ['^[a-z0-9-]+$', 'Lowercase, digits and hyphens'] }
-      - { name: permalink, label: Compute, widget: compute, value: '/lab/widgets/#{{fields.slug}}', hint: Derived from the slug above. }
-      - { name: summary, label: Text, widget: text, required: false }
-      - { name: count, label: Number (int), widget: number, value_type: int, min: 0, after_input: items }
-      - { name: price, label: Number (float), widget: number, value_type: float, step: 0.01, before_input: '€' }
-      - { name: enabled, label: Boolean, widget: boolean }
-      - { name: released, label: Date and time, widget: datetime }
-      - { name: day, label: Date only, widget: datetime, type: date, format: YYYY-MM-DD }
-      - { name: level, label: Select (radio), widget: select, options: [beginner, intermediate, advanced] }
-      - { name: platforms, label: Select (multiple), widget: select, multiple: true, options: [linux, macos, windows, android] }
-      - name: favourite_note
-        label: Relation (filtered to snippets)
-        widget: relation
-        collection: lab_notes
-        value_field: '{{slug}}'
-        display_fields: [title]
-        filters: [{ field: kind, values: [snippet] }]
-        required: false
-      - name: related_notes
-        label: Relation (multiple)
-        widget: relation
-        collection: lab_notes
-        value_field: '{{slug}}'
-        display_fields: [title, kind]
-        multiple: true
-        required: false
-      - { name: accent, label: Colour with alpha, widget: color, enableAlpha: true, allowInput: true }
-      - { name: location, label: Map, widget: map, center: [28.9784, 41.0082], zoom: 10, required: false }
-      - { name: snippet, label: Code, widget: code, default_language: python, required: false }
-      - { name: env, label: Key-value, widget: keyvalue, key_label: Variable, value_label: Value, required: false }
-      - { name: image, label: Image, widget: image, required: false }
-      - { name: attachment, label: File, widget: file, required: false }
-      - { name: links, label: List (simple), widget: list, field: { name: url, label: URL, widget: string }, required: false }
-      - name: author
-        label: Object
-        widget: object
-        collapsed: auto
-        summary: '{{fields.name}}'
-        fields:
-          - { name: name, label: Name, widget: string }
-          - { name: role, label: Role, widget: string, required: false }
-      - { name: markdown, label: Rich text (Markdown), widget: richtext, required: false }
-      - { name: schema_version, label: Hidden, widget: hidden, default: 1 }
-      - name: blocks
-        label: List with types (page builder)
-        label_singular: Block
-        widget: list
-        required: false
-        types:
-          - { name: heading, label: Heading, widget: object, summary: '# {{fields.text}}', fields: [{ name: text, label: Text, widget: string }] }
-          - { name: paragraph, label: Paragraph, widget: object, fields: [{ name: text, label: Text, widget: richtext }] }
-          - name: callout
-            label: Callout
-            widget: object
-            summary: '[{{fields.kind}}] {{fields.text}}'
-            fields:
-              - { name: kind, label: Kind, widget: select, options: [note, tip, warning], default: note }
-              - { name: text, label: Text, widget: text }
-          - name: link
-            label: Link
-            widget: object
-            summary: '{{fields.label}} → {{fields.url}}'
-            fields:
-              - { name: label, label: Label, widget: string }
-              - { name: url, label: URL, widget: string, type: url }
-
-# Lab: a media library folder of its own, browsable under Assets.
-asset_collections:
-  - name: lab_media
-    label: Lab media
-    icon: photo_library
-    media_folder: public/uploads/lab
-    public_folder: /uploads/lab

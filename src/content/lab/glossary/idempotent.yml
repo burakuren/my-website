@@ -1,8 +1,0 @@
-en:
-  term: Idempotent
-  definition: Running it twice has the same effect as running it once.
-  category: backend
-tr:
-  term: Etkisiz (idempotent)
-  definition: İki kez çalıştırmak, bir kez çalıştırmakla aynı sonucu verir.
-  category: backend

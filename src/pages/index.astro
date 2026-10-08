@@ -8,24 +8,10 @@ import photo from '../assets/burak.jpg';
 import SectionHead from '../components/SectionHead.astro';
 import { monthLabel, shortHash } from '../lib/format';
 import { SITE_URL } from '../site.config.mjs';
-import '../styles/lab.css';
-import LabNoteList from '../components/LabNoteList.astro';
-import LabDocTree from '../components/LabDocTree.astro';
-import LabGlossary from '../components/LabGlossary.astro';
-import LabBlocks from '../components/LabBlocks.astro';
-import { categoryUrl, getCategories, getNotes } from '../lib/lab';
-import { getPosts, postUrl } from '../lib/posts';
-import { isoDate } from '../lib/format';
 
 const profile = (await getEntry('profile', 'profile'))!.data;
 const skills = (await getEntry('skills', 'skills'))!.data;
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).map((p) => p.data);
-// Lab: categories (Relation field on projects, posts and notes) and lab content.
-const categories = await getCategories();
-const catOf = (id?: string) => categories.find((c) => c.id === id);
-const projectCats = categories.filter((c) => projects.some((p) => p.category?.id === c.id));
-const notes = (await getNotes()).slice(0, 5);
-const latestPosts = (await getPosts()).slice(0, 3);
 const experience = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order).map((e) => e.data);
 
 // Square JPEG of the photo for structured data (search engines want a stable, crawlable URL).
@@ -165,14 +151,6 @@ const jsonLd = [
     <section id="projects" class="section" aria-labelledby="projects-title">
       <SectionHead id="projects" title="PROJECTS" cmd="ls -l ~/projects" />
       <div class="ls indent">
-        {projectCats.length > 1 && (
-          <div class="tag-filter lab-project-filter" role="group" aria-label="Filter projects by category" data-project-filter hidden>
-            <button type="button" aria-pressed="true" data-cat="all">--category=all</button>
-            {projectCats.map((c) => (
-              <button type="button" aria-pressed="false" data-cat={c.id} style={`--accent: ${c.data.color}`}><span class="dot" />{c.data.name}</button>
-            ))}
-          </div>
-        )}
         <div class="ls-total" aria-hidden="true">total {projects.length}</div>
         <div class="ls-row ls-head" aria-hidden="true">
           <span>MODE</span><span>NAME</span><span>DESCRIPTION</span><span>TAGS</span>
@@ -182,7 +160,7 @@ const jsonLd = [
             projects.map((p) => {
               const label = p.kind === 'dir' ? `${p.name}/` : p.name;
               return (
-                <li class="ls-row" data-project data-cat={p.category?.id ?? ''}>
+                <li class="ls-row">
                   <span class="muted" aria-hidden="true">{p.kind === 'dir' ? 'drwxr-xr-x' : '-rwxr-xr-x'}</span>
                   {p.url ? (
                     <a class="ls-name" href={p.url} {...(isExternal(p.url) ? { rel: 'noopener' } : {})}>{label}</a>
@@ -190,12 +168,7 @@ const jsonLd = [
                     <span class="ls-name">{label}</span>
                   )}
                   <p class="ls-desc">{p.description}</p>
-                  <ul class="tag-list">
-                    {catOf(p.category?.id) && (
-                      <li><a class="tag" href={categoryUrl(p.category!.id)} style={`--accent: ${catOf(p.category?.id)!.data.color}`}><span class="dot" />{catOf(p.category?.id)!.data.name}</a></li>
-                    )}
-                    {p.tags.map((t) => <li class="tag">{t}</li>)}
-                  </ul>
+                  <ul class="tag-list">{p.tags.map((t) => <li class="tag">{t}</li>)}</ul>
                 </li>
               );
             })
@@ -253,51 +226,6 @@ const jsonLd = [
       </div>
     </section>
 
-    <section id="writing" class="section" aria-labelledby="writing-title">
-      <SectionHead id="writing" title="WRITING" cmd="ls -t ~/blog | head -3" />
-      <ul class="lab-tree indent">
-        {
-          latestPosts.map((p) => {
-            const c = catOf(p.data.category?.id);
-            return (
-              <li>
-                <span class="muted">{isoDate(p.data.pubDate)}</span> <a href={postUrl(p)}>{p.data.title}</a>{' '}
-                {c && <a class="tag" href={categoryUrl(c.id)} style={`--accent: ${c.data.color}`}><span class="dot" />{c.data.name}</a>}
-              </li>
-            );
-          })
-        }
-      </ul>
-    </section>
-
-    <section id="notes" class="section" aria-labelledby="notes-title">
-      <SectionHead id="notes" title="NOTES" cmd="ls -l ~/lab/notes | head -5" />
-      <div class="lab-cards indent">
-        {categories.map((c) => (
-          <a class="lab-card" href={categoryUrl(c.id)} style={`--accent: ${c.data.color}`}><strong>{c.data.name}</strong><span>{c.data.description}</span></a>
-        ))}
-      </div>
-      <div class="indent"><LabNoteList notes={notes} categories={categories} /></div>
-    </section>
-
-    <section id="docs" class="section" aria-labelledby="docs-title">
-      <SectionHead id="docs" title="DOCS" cmd="tree ~/lab/docs" />
-      <div class="indent"><LabDocTree /></div>
-    </section>
-
-    <section id="glossary" class="section" aria-labelledby="glossary-title">
-      <SectionHead id="glossary" title="GLOSSARY" cmd="cat glossary.{en,tr}" />
-      <div class="indent"><LabGlossary /></div>
-    </section>
-
-    <section id="blocks" class="section" aria-labelledby="blocks-title">
-      <SectionHead id="blocks" title="BLOCKS" cmd="render ~/lab/widgets --blocks" />
-      <div class="indent">
-        <LabBlocks />
-        <p><a href="/lab/widgets/">every field type →</a></p>
-      </div>
-    </section>
-
     <section id="contact" class="section" aria-labelledby="contact-title">
       <SectionHead id="contact" title="CONTACT" cmd="cat contact.txt" />
       <div class="contact indent">
@@ -331,20 +259,3 @@ const jsonLd = [
     </section>
   </main>
 </Base>
-
-<script>
-  // Lab: filter projects by category; rows are server-rendered, this only hides them.
-  const filter = document.querySelector<HTMLElement>('[data-project-filter]');
-  if (filter) {
-    filter.hidden = false;
-    const buttons = [...filter.querySelectorAll<HTMLButtonElement>('[data-cat]')];
-    const rows = [...document.querySelectorAll<HTMLElement>('[data-project]')];
-    buttons.forEach((b) =>
-      b.addEventListener('click', () => {
-        const cat = b.dataset.cat!;
-        buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-        rows.forEach((r) => (r.hidden = cat !== 'all' && r.dataset.cat !== cat));
-      }),
-    );
-  }
-</script>
