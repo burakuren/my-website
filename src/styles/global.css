@@ -432,10 +432,6 @@ main:focus { outline: none; }
 .section { padding-top: 112px; }
 
 .section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
 }
@@ -443,6 +439,48 @@ main:focus { outline: none; }
   font-size: var(--fs-2xl);
   font-weight: 600;
   letter-spacing: -0.015em;
+}
+
+/* h2 + `#` link + "Link copied" status (SectionTitle.astro). Dimmed but
+   visible so touch screens can find it; full colour on hover/focus.
+   Inline, so the `#` follows the last word of a heading that wraps. */
+.section-head h2,
+.contact-title h2 { display: inline; }
+.section-anchor {
+  margin-left: 4px;
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-xl);
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0.5;
+}
+.section-anchor:focus-visible { opacity: 1; color: var(--green); }
+@media (hover: hover) {
+  .section-head:hover .section-anchor,
+  .contact-title:hover .section-anchor { opacity: 1; }
+  .section-anchor:hover { color: var(--green); }
+}
+.anchor-status { font-size: var(--fs-sm); color: var(--muted); }
+
+/* In the two-column contact card an inline `#` pushed the heading onto a
+   second line, so there it sits in the card's left padding, on the first
+   line's baseline (the anchor is an h2-sized sans strut, the `#` inside it
+   is mono), with the status above the heading. */
+@media (min-width: 901px) {
+  .contact-title { position: relative; }
+  .contact-title .section-anchor {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    margin: 0;
+    padding: 0 8px;
+    font-family: var(--sans);
+    font-size: var(--fs-2xl);
+    line-height: 1.2;
+  }
+  .contact-title .section-anchor span { font-family: var(--mono); font-size: var(--fs-xl); }
+  .contact-title .anchor-status { position: absolute; left: 0; bottom: 100%; margin-bottom: 4px; }
 }
 
 /* ---------- Services ---------- */
@@ -834,7 +872,6 @@ main:focus { outline: none; }
   .availability { margin-left: 0; width: 100%; }
 
   .section { padding-top: 80px; }
-  .section-head { flex-direction: column; gap: 4px; align-items: flex-start; }
 
   .job { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .job-when { padding-top: 0; display: flex; gap: 12px; align-items: baseline; }

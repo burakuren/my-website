@@ -1,0 +1,19 @@
+---
+/**
+ * A home-page section's h2 followed by a `#` link to the section, so any
+ * section can be shared (`/#experience`). The link sits beside the h2, not
+ * inside it, to keep the heading's accessible name clean.
+ * `src/lib/section-links.ts` copies the URL on click.
+ */
+interface Props {
+  /** The section's id; the h2 gets `${id}-title` for aria-labelledby. */
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+{/* No whitespace before the link and a word joiner before `#`: the `#` wraps with the last word, never alone. */}
+<h2 id={`${id}-title`}>{title}</h2><a class="section-anchor" href={`#${id}`} aria-label={`Link to ${title}`}><span aria-hidden="true">{'⁠'}#</span></a>
+<span class="anchor-status" role="status" aria-live="polite"></span>

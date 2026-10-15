@@ -5,6 +5,7 @@ import Base from '../layouts/Base.astro';
 import Avatar from '../components/Avatar.astro';
 import GuestCard from '../components/GuestCard.astro';
 import Icon from '../components/Icon.astro';
+import SectionTitle from '../components/SectionTitle.astro';
 import photo from '../assets/burak.jpg';
 import { getPosts, isExternal, postUrl } from '../lib/posts';
 import { dateLabel, monthLabel } from '../lib/format';
@@ -104,9 +105,9 @@ const jsonLd = [
 
     {
       profile.services.length > 0 && (
-        <section class="section wrap" id="help" aria-labelledby="help-title">
+        <section class="section wrap" id="services" aria-labelledby="services-title">
           <header class="section-head">
-            <h2 id="help-title">How I can help</h2>
+            <SectionTitle id="services" title="How I can help" />
           </header>
           <ul class="services" role="list">
             {profile.services.map((s) => (
@@ -131,7 +132,7 @@ const jsonLd = [
 
     <section class="section wrap" id="experience" aria-labelledby="experience-title">
       <header class="section-head">
-        <h2 id="experience-title">Experience</h2>
+        <SectionTitle id="experience" title="Experience" />
       </header>
       <ol class="timeline" role="list">
         {
@@ -201,7 +202,7 @@ const jsonLd = [
 
     <section class="section wrap" id="about" aria-labelledby="about-title">
       <header class="section-head">
-        <h2 id="about-title">About me</h2>
+        <SectionTitle id="about" title="About me" />
       </header>
       <div class="about">
         <div class="about-text">
@@ -227,7 +228,7 @@ const jsonLd = [
 
     <section class="section wrap" id="skills" aria-labelledby="skills-title">
       <header class="section-head">
-        <h2 id="skills-title">Skills and tools</h2>
+        <SectionTitle id="skills" title="Skills and tools" />
       </header>
       <div class="skills" role="table" aria-label="Skills">
         {
@@ -249,7 +250,7 @@ const jsonLd = [
       posts.length > 0 && (
         <section class="section wrap" id="blog" aria-labelledby="blog-title">
           <header class="section-head">
-            <h2 id="blog-title">Blog</h2>
+            <SectionTitle id="blog" title="Blog" />
           </header>
           <ul class="posts" role="list">
             {posts.map((p) => (
@@ -286,7 +287,9 @@ const jsonLd = [
     <section class="section wrap" id="contact" aria-labelledby="contact-title">
       <div class="contact">
         <div class="contact-main">
-          <h2 id="contact-title">{profile.contactHeading}</h2>
+          <div class="contact-title">
+            <SectionTitle id="contact" title={profile.contactHeading} />
+          </div>
           {profile.contactText && <p>{profile.contactText}</p>}
           <div class="email-row">
             <a class="email-link" href="#contact" data-mailto>{displayEmail(profile.email)}</a>
@@ -337,3 +340,7 @@ const jsonLd = [
     </section>
   </main>
 </Base>
+
+<script>
+  import '../lib/section-links';
+</script>
