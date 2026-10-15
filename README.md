@@ -17,12 +17,13 @@ Personal site of Burak Üren: a static [Astro](https://astro.build) build, conte
 
 | File | Edited in the CMS as | Shown on |
 | --- | --- | --- |
-| `src/data/profile.yml` | Profile & home page | Hero, terminal card, about, contact, SEO, structured data |
-| `src/data/projects.yml` | Projects | `ls -l ~/projects` |
-| `src/data/experience.yml` | Experience | `git log --career` |
-| `src/data/skills.yml` | Skills | `skills.conf` |
-| `src/content/blog/<slug>/index.md` | Blog | `/blog/` and `/blog/<slug>/` |
-| `public/resume.pdf` | (replace the file) | Resume download buttons |
+| `src/data/profile.yml` | Profile & home page | Hero, How I can help, About me, Contact, SEO, structured data |
+| `src/data/experience.yml` | Experience | Experience timeline and its "Technical details" |
+| `src/data/skills.yml` | Skills | Skills and tools |
+| `src/content/blog/<slug>/index.md` | Blog | `/blog/`, `/blog/<slug>/` and the home Blog section |
+| `public/cv.pdf` | (replace the file) | Download CV buttons |
+
+In CMS text fields, wrap metrics in `**double asterisks**` to make them bold.
 
 Schemas are in `src/content.config.ts`; a CMS edit that doesn't match fails the build instead of shipping broken content.
 
@@ -30,6 +31,7 @@ Schemas are in `src/content.config.ts`; a CMS edit that doesn't match fails the 
 
 - New posts start as **drafts**. Drafts render in `npm run dev` and are left out of production builds, the sitemap and RSS.
 - The `/blog/` page is `noindex` and out of the sitemap until the first post is published.
+- Guest posts (published elsewhere): fill in "Guest post URL" and "publisher" and leave the body empty. They show as cards that link out; no page is built.
 - Images go next to the post (`src/content/blog/<slug>/`) and are optimised by Astro.
 - Markdown extras:
   - Code fence titles: ` ```ini title="api.socket" `
@@ -50,7 +52,7 @@ npm run preview    # build, then serve dist/ with wrangler dev (production heade
 
 The CMS works against your local clone too: run `npm run dev`, open `http://localhost:4321/admin/index.html` and choose "Work with Local Repository".
 
-`npm run images` regenerates `public/og.png` and the icons from `src/data/profile.yml` (needs JetBrains Mono installed locally).
+`npm run images` regenerates `public/og.png` and the icons from `src/data/profile.yml` (the card is rendered by headless Chromium and loads its fonts from Google Fonts).
 
 ## Deployment
 

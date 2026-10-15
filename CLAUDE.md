@@ -9,7 +9,7 @@ npm run dev        # astro dev on :4321; drafts visible; CMS at /admin/index.htm
 npm run check      # astro check: types + content schemas. Run before every push.
 npm run build      # static build into dist/
 npm run preview    # build + wrangler dev on :8787 (real _headers/_redirects)
-npm run images     # regenerate public/og.png + icons from profile.yml and src/assets/burak.jpg
+npm run images     # regenerate public/og.png (headless Chromium, needs network for fonts) + icons from profile.yml and src/assets/burak.jpg
 npm run deploy     # manual site deploy (normally CI does it)
 ```
 
@@ -17,32 +17,34 @@ npm run deploy     # manual site deploy (normally CI does it)
 
 ## Design source
 
-- Design lives in Claude Design exports under `design/` (gitignored, local only). They are self-extracting bundles; read them with `python3 -I scripts/unpack-design.py "design/<file>.html" <out-dir>`. Each board becomes a folder; markup uses `{{c.*}}` placeholders and the colours/data/embedded images are in the board's `text/x-dc` script.
-- Visual language: Linux terminal + man pages + git (`UREN(1)` running headers, `$ cat about.md` section commands, `ls -l` projects, `git log` experience, `.conf` skills, `~ ❯` prompts). Keep new UI and copy in that voice.
+- Design lives under `design/` (gitignored, local only). The current one is `design/v2/`: static HTML mockups (`index.html`, `blog/index.html`, `blog/post.html`, `og/og.html`) with `styles.css`, screenshots in `screens/`, the spec in `HANDOFF.md` and reasoning in `README.md`. Older Claude Design exports are self-extracting bundles; read them with `python3 -I scripts/unpack-design.py "design/<file>.html" <out-dir>`.
+- Visual language (v2): plain English first, terminal as an accent. Plain section headings ("How I can help", "Experience", "About me", "Skills and tools", "Blog"), no explainer lines under them. The terminal shows up only as accents: the `~ ❯` mark, the name in JetBrains Mono 700, `--flag` service labels, the git-graph rail in Experience, and "Technical details" styled as terminal output. IBM Plex Sans for prose, JetBrains Mono only for code, tool names, tags, the email and the name. Metrics are always bold (`**x**` in CMS text, rendered by `src/lib/inline.ts`). Links side by side use `.link-row` (icon + label, LinkedIn, GitHub, then extras). Don't reintroduce man-page labels (`NAME`, `UREN(1)`, `$ cat ...`).
 - Theme tokens are CSS custom properties in `src/styles/global.css`. The site is dark only (the light theme and its toggle were removed on purpose). Colours must come from tokens, not literals.
-- Responsive layout: at <=760px the header is one sticky row with a `menu` toggle (nav drops down as `cd ./about` rows; without JS the links just wrap). The hero is two columns only at >=1080px; below that the photo sits beside the name (first screen on phones) and the photo inside the terminal card is hidden. Both `<Avatar size={152}>` share URLs, so only one download. Hover colour changes are wrapped in `@media (hover: hover)` so tapped links don't stay lit on touch screens. On phones the floating `cd ~` button is hidden (a fixed bottom element made Firefox Android's bottom toolbar reappear and shift the page); tapping the header prompt on `/` scrolls to top instead (`src/lib/scroll-top.ts`). The viewport meta has `viewport-fit=cover` (no Chrome Android "chin"), so bottom-anchored things use `env(safe-area-inset-bottom)`.
+- Header (all pages): sticky; `~ ❯` + name (links home; on `/` it scrolls to top via `src/lib/scroll-top.ts`), "Blog", LinkedIn/GitHub/RSS icon links (from the `IconSprite.astro` sprite), "Download CV". No section nav or menu toggle; under 520px the `~ ❯` mark and the CV button hide. No floating back-to-top button (a fixed bottom element made Firefox Android's bottom toolbar reappear and shift the page).
+- Responsive layout: the hero is two columns at >=1080px (300px round photo on the right); below that the photo sits beside the name (152px, 120px at <=760px with the name on two lines). It is a single `<Avatar>` with `widths`/`sizes`, moved by grid areas, so the photo downloads once. Services, about, contact stack under 900px; experience, blog rows and skills stack at <=760px. The post TOC is a sticky rail at >=1080px and a closed `<details>` below. Hover colour changes are wrapped in `@media (hover: hover)` so tapped links don't stay lit on touch screens. The viewport meta has `viewport-fit=cover` (no Chrome Android "chin"), so bottom-anchored things use `env(safe-area-inset-bottom)`.
+- Email: never in the HTML or any `href`. `Base.astro` puts it base64-encoded on `<body data-m>`; `[data-mailto]` links point at `#contact` and `src/lib/mailto.ts` opens `mailto:` on click (and powers "Copy address"). Keep it out of JSON-LD and RSS (RSS uses `dc:creator`).
 - The user's real photo (`src/assets/burak.jpg`, rendered via `src/components/Avatar.astro` as AVIF/WebP/JPEG) replaced the design's ASCII portrait everywhere. Don't reintroduce ASCII art for him.
 
 ## Content model
 
 | Data | File | Schema | CMS |
 | --- | --- | --- | --- |
-| Profile, hero, about, contact, SEO | `src/data/profile.yml` | `profile` in `src/content.config.ts` | singleton `profile` |
-| Projects | `src/data/projects.yml` (`projects:` list) | `projects` | singleton `projects` |
+| Profile, hero, services, about + facts, contact, SEO | `src/data/profile.yml` | `profile` in `src/content.config.ts` | singleton `profile` |
 | Experience | `src/data/experience.yml` (`entries:` list, newest first) | `experience` | singleton `experience` |
-| Skills | `src/data/skills.yml` | `skills` | singleton `skills` |
+| Skills | `src/data/skills.yml` (`groups:` of area + comma list) | `skills` | singleton `skills` |
 | Posts | `src/content/blog/<slug>/index.md` (page bundles; images beside the post) | `blog` | collection `blog` |
 
 - **Any field change must be made in three places:** the YAML, the Zod schema in `src/content.config.ts`, and `public/admin/config.yml`. Sveltia writes with `omit_empty_optional_fields`, so optional fields must be `.optional()`/`.default()`, never required-but-empty.
 - Posts default to `draft: true`. Drafts render only in dev (`src/lib/posts.ts`). `/blog/` is `noindex` and kept out of the sitemap until a published post exists (logic in `astro.config.mjs` + `src/pages/blog/index.astro`).
-- Markdown pipeline (Astro 7 Sätteri processor): Shiki with the `css-variables` theme mapped to site tokens; `src/lib/shiki-code-header.mjs` wraps code blocks (fence meta `title="..."`, copy button revealed by JS); `satteri-callouts` for `> [!NOTE]`; `src/lib/satteri-figure.mjs` turns `![alt](img "caption")` into figure/figcaption.
+- Guest posts are body-less blog entries with `externalUrl` + `publisher`: no page is built, lists render them as cards linking out (new tab), RSS links to the external URL, and they count as published.
+- Markdown pipeline (Astro 7 Sätteri processor): Shiki with the `css-variables` theme mapped to site tokens; `src/lib/shiki-code-header.mjs` wraps code blocks (fence meta `title="..."`, copy button revealed by JS); `satteri-callouts` for `> [!NOTE]`; `src/lib/satteri-figure.mjs` turns `![alt](img "caption")` into figure/figcaption; `src/lib/satteri-prose.mjs` adds h2 `#` anchors and wraps tables in `.table-scroll` (it sets heading ids itself with github-slugger, because Astro assigns ids after user plugins and keeps existing ones).
 - The CV is `public/cv.pdf` (contains a phone number). `_headers` forces download as `Burak_Uren_CV.pdf` with `X-Robots-Tag: noindex`; `/resume.pdf` 301s to it. The source CV lives in `CV/` (gitignored).
 - Site copy is English only.
 - No em dashes (—) or en dashes (–) anywhere in site copy, titles, meta or CMS hints. Use a plain hyphen, colon, semicolon, comma or `|` (page titles: `Page | Burak Üren`).
 
 ## Astro 7 gotchas hit in this project
 
-- `compressHTML: true` is set on purpose. Astro 7's default `'jsx'` strips whitespace between inline elements and breaks the terminal markup (`<span>~</span> <span>❯</span>`).
+- `compressHTML: true` is set on purpose. Astro 7's default `'jsx'` strips whitespace between inline elements (e.g. `<strong>5,000+</strong> registered users`).
 - CSP is Astro's `security.csp` (a `<meta>` tag with hashes). The inline head script (adds `.js` to `<html>` before paint) is hashed from `src/lib/head-init.mjs`; edit it only there. Styles need `'unsafe-inline'` because Shiki uses style attributes, so the build warns "Shiki ... not compatible with CSP". That warning is expected. The Cloudflare Web Analytics beacon is allowlisted in `script-src`/`connect-src`.
 - A global `[hidden] { display: none !important; }` exists because components set `display: flex` and progressive-enhancement JS toggles `hidden`.
 - `.wrap` needs `width: 100%`: `main` is a flex item of a column flexbox, and auto margins otherwise shrink it to content width.
