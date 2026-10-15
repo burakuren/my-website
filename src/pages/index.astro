@@ -9,8 +9,8 @@ import photo from '../assets/burak.jpg';
 import { getPosts, isExternal, postUrl } from '../lib/posts';
 import { dateLabel, monthLabel } from '../lib/format';
 import { bold } from '../lib/inline';
-import { cvFileName, displayEmail, socialIcon } from '../lib/social';
-import { SITE_URL } from '../site.config.mjs';
+import { displayEmail, socialIcon } from '../lib/social';
+import { CV_FILENAME, SITE_URL } from '../site.config.mjs';
 
 const profile = (await getEntry('profile', 'profile'))!.data;
 const skills = (await getEntry('skills', 'skills'))!.data;
@@ -19,7 +19,6 @@ const posts = (await getPosts()).slice(0, 3);
 
 // Square JPEG of the photo for structured data (search engines want a stable, crawlable URL).
 const photoLd = await getImage({ src: photo, width: 400, height: 400, format: 'jpg', quality: 85 });
-const cvName = cvFileName(profile.name);
 const socialLinks = profile.social.flatMap((s) => {
   const icon = socialIcon(s.key);
   return icon ? [{ ...s, icon }] : [];
@@ -85,7 +84,7 @@ const jsonLd = [
           <a class="btn btn-primary" href="#contact" data-mailto>Email me</a>
           {
             profile.resume && (
-              <a class="btn" href={profile.resume} download={cvName}>
+              <a class="btn" href={profile.resume} download={CV_FILENAME}>
                 Download CV
                 <Icon name="i-download" />
               </a>
@@ -308,7 +307,7 @@ const jsonLd = [
             {
               profile.resume && (
                 <li>
-                  <a href={profile.resume} download={cvName}>
+                  <a href={profile.resume} download={CV_FILENAME}>
                     <Icon name="i-download" />
                     Download CV
                   </a>

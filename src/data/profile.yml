@@ -8,8 +8,8 @@ lead: >-
   Flask, for products used by thousands of people, including a tutoring
   marketplace I founded.
 availability: Open to a new role or project
-seoTitle: Burak Üren | Backend Engineer (Python, Django, DevOps)
-seoDescription: Backend engineer in Istanbul. I build the APIs, databases, payments and background jobs behind web products, and keep them running.
+seoTitle: Burak Üren | Backend Engineer in Istanbul (Python, Django)
+seoDescription: Backend engineer in Istanbul with 3+ years of building REST APIs, payments, background jobs and the servers under them in Python, Django and Flask.
 services:
   - flag: --build
     title: Build your backend

@@ -1,7 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { cvFileName, socialIcon } from '../lib/social';
+import { socialIcon } from '../lib/social';
+import { CV_FILENAME } from '../site.config.mjs';
 
 interface Props {
   section: 'home' | 'blog' | 'none';
@@ -32,7 +33,7 @@ const profile = (await getEntry('profile', 'profile'))!.data;
         })
       }
       <a class="icon-link" href="/rss.xml" aria-label="RSS feed" title="RSS feed"><Icon name="si-rss" /></a>
-      {profile.resume && <a class="btn btn-sm nav-cv" href={profile.resume} download={cvFileName(profile.name)}>Download CV</a>}
+      {profile.resume && <a class="btn btn-sm nav-cv" href={profile.resume} download={CV_FILENAME}>Download CV</a>}
     </nav>
   </div>
 </header>

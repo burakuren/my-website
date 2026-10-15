@@ -22,7 +22,7 @@
 # the CV, which includes a phone number, out of search results.
 /cv.pdf
   X-Robots-Tag: noindex
-  Content-Disposition: attachment; filename="Burak_Uren_CV.pdf"
+  Content-Disposition: attachment; filename="Burak_Uren_CV_BackendEngineer.pdf"
 
 /rss.xml
   Content-Type: application/rss+xml; charset=utf-8

@@ -38,7 +38,7 @@ npm run deploy     # manual site deploy (normally CI does it)
 - Posts default to `draft: true`. Drafts render only in dev (`src/lib/posts.ts`). `/blog/` is `noindex` and kept out of the sitemap until a published post exists (logic in `astro.config.mjs` + `src/pages/blog/index.astro`).
 - Guest posts are body-less blog entries with `externalUrl` + `publisher`: no page is built, lists render them as cards linking out (new tab), RSS links to the external URL, and they count as published.
 - Markdown pipeline (Astro 7 Sätteri processor): Shiki with the `css-variables` theme mapped to site tokens; `src/lib/shiki-code-header.mjs` wraps code blocks (fence meta `title="..."`, copy button revealed by JS); `satteri-callouts` for `> [!NOTE]`; `src/lib/satteri-figure.mjs` turns `![alt](img "caption")` into figure/figcaption; `src/lib/satteri-prose.mjs` adds h2 `#` anchors and wraps tables in `.table-scroll` (it sets heading ids itself with github-slugger, because Astro assigns ids after user plugins and keeps existing ones).
-- The CV is `public/cv.pdf` (contains a phone number). `_headers` forces download as `Burak_Uren_CV.pdf` with `X-Robots-Tag: noindex`; `/resume.pdf` 301s to it. The source CV lives in `CV/` (gitignored).
+- The CV is `public/cv.pdf` (contains a phone number). `_headers` forces download as `Burak_Uren_CV_BackendEngineer.pdf` (same name as the source file; `CV_FILENAME` in `src/site.config.mjs` sets the `download` attribute) with `X-Robots-Tag: noindex`; `/resume.pdf` 301s to it. The source CV lives in `CV/` (gitignored).
 - Site copy is English only.
 - No em dashes (—) or en dashes (–) anywhere in site copy, titles, meta or CMS hints. Use a plain hyphen, colon, semicolon, comma or `|` (page titles: `Page | Burak Üren`).
 
