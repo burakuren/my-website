@@ -6,19 +6,19 @@ entries:
     start: 2026-03
     summary: >-
       A referral platform for a private tutoring service: parents and students
-      invite others, and the team follows up each lead in order. Live in
-      production.
+      invite others, and the team follows up each lead in order. I'm the sole
+      backend engineer and built it from scratch; it is live in production.
     results:
-      - value: ~100
-        label: people using it
-      - value: 50+
-        label: referrals tracked end to end
+      - value: 60+
+        label: referrers in a multi-level network
+      - value: From scratch
+        label: designed and built as the sole backend engineer
       - value: Every release
         label: checked by an automated test suite before it ships
     highlights:
-      - Django and PostgreSQL; multi-level referrer network and an ordered outreach pipeline with enforced stage transitions.
-      - Test-first in Scrum iterations; pytest and factory-boy suite guards every release.
-      - Dockerized; GitHub Actions CI/CD ships versioned images to DigitalOcean Container Registry.
+      - Django, HTMX and PostgreSQL; multi-level referrer network and an outreach pipeline with enforced stage transitions.
+      - Test-first in Scrum iterations; pytest, factory-boy and mypy checks guard every release.
+      - Dockerized; GitHub Actions CI/CD ships versioned images to DigitalOcean Container Registry several times a week.
     stack: [django, postgresql, htmx, docker, github actions]
   - role: Backend Engineer
     org: SMGrader
@@ -26,22 +26,25 @@ entries:
     end: 2025-11
     summary: >-
       An AI-powered grading platform: it grades student work and syncs the
-      results with the school's learning system. I built most of its server
-      side over three years.
+      results with the school's learning system. Part-time and remote in a
+      5-person team based in Melbourne, I built most of its server side over
+      three years.
     results:
-      - value: 80%
+      - value: ~80%
         label: fewer repeated database reads after adding a shared cache
-      - value: Hours to minutes
+      - value: ~1 h to ~30 min
         label: to find out why a grading job failed
-      - value: ~20%
-        label: of jobs cancelled early, so they never cost an AI call
+      - value: 15-20%
+        label: fewer AI calls by stopping cancelled jobs early
     highlights:
       - REST API in Django REST Framework plus **4** async microservices on Celery, RabbitMQ and Redis.
-      - Organization-level RBAC on Django's permission framework; Stripe with per-user token budgets.
-      - Background job system handling **hundreds** of grading jobs a day; graceful cancellation via a Redis flag.
+      - Organization-level RBAC on Django's permission framework.
+      - Stripe billing with per-user token budgets that cap AI usage per paid plan.
+      - Background job system handling **~200** grading jobs a day; graceful cancellation via a Redis flag checked before any AI call.
       - Redis read-through cache with TTL for metadata shared across tasks.
-      - Message-level logging and alerting with Grafana, Loki and Slack; two-way Canvas LMS sync.
-      - AWS (RDS, S3, EKS, ElastiCache) deployed through Jenkins; helped DevOps with Kubernetes scaling.
+      - Message-level logging and Grafana, Loki and Slack alerts co-designed with DevOps.
+      - Two-way Canvas LMS integration (LTI and REST API) across **~20** courses.
+      - AWS (RDS, S3, EKS, ElastiCache) deployed through Jenkins; supported Kubernetes scaling.
     stack: [drf, celery, rabbitmq, redis, stripe, aws, grafana]
   - role: Founder and Backend Engineer
     org: BanaDersBul
@@ -55,15 +58,16 @@ entries:
     results:
       - value: 5,000+
         label: registered users
-      - value: $180 to $40
-        label: monthly hosting cost
-      - value: Hundreds to tens
-        label: of milliseconds for repeat searches
+      - value: 99.88%
+        label: uptime
+      - value: 78%
+        label: lower monthly hosting cost
     highlights:
-      - Flask REST API with SQLAlchemy (Alembic migrations) and PostgreSQL full-text search.
-      - Search results cached in Redis keyed by a query hash.
+      - Flask REST API with SQLAlchemy (Alembic migrations) and PostgreSQL full-text search; documented in OpenAPI/Swagger.
+      - Search results cached in Redis keyed by a query hash; repeat searches **10x** faster (**~300 ms** to **~30 ms**).
       - JWT auth for logins, secure file downloads, password resets and admin impersonation; Flask-Admin panel.
-      - Migrated from DigitalOcean Kubernetes to a self-managed Docker Compose server.
+      - Ran production on DigitalOcean Kubernetes for **4** years with Helm charts, Nginx ingress with TLS, resource limits and scaling.
+      - Then migrated to a self-managed Docker Compose server; dropping the Kubernetes overhead cut hosting cost **78%**.
       - One-click GitHub Actions deploys with SOPS + age encrypted secrets; hardened SSH, UFW firewall, fail2ban.
-      - Docker images shrunk from **1.14 GB** to **199 MB**; **3** repos merged into a monorepo; build and push from **~10** to **2 min**.
+      - Docker images shrunk from **1.14 GB** to **199 MB**; **3** repos merged into a monorepo; build and push from **~10** to **~2 min**.
     stack: [flask, sqlalchemy, postgresql, redis, docker compose, caddy]

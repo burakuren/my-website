@@ -1,15 +1,15 @@
 groups:
-  - name: Languages
+  - name: Programming
     tools: Python, SQL, Bash
-  - name: Frameworks
-    tools: Django, Django REST Framework, Flask, SQLAlchemy, Celery, HTMX
-  - name: Data
-    tools: PostgreSQL, Redis, RabbitMQ, pandas
-  - name: Cloud and servers
-    tools: AWS (RDS, S3, EKS, ElastiCache), DigitalOcean, Docker, Docker Compose, Kubernetes, Caddy, Nginx, Cloudflare, Linux
-  - name: Testing and delivery
-    tools: pytest, factory-boy, GitHub Actions, Jenkins, SOPS + age, mypy, black, flake8, isort
-  - name: Monitoring
-    tools: Grafana, Loki
-  - name: Concepts
-    tools: REST API design, OpenAPI/Swagger, microservices, async task queues, caching, RBAC, JWT/OAuth, Stripe payments
+  - name: Backend
+    tools: Django, Django REST Framework, Flask, SQLAlchemy, Alembic, Celery, HTMX
+  - name: Data and messaging
+    tools: PostgreSQL (incl. full-text search), Redis, RabbitMQ, pandas
+  - name: Cloud and infra
+    tools: AWS (RDS, S3, EKS, ElastiCache), DigitalOcean, Nginx, Caddy, Cloudflare, Linux
+  - name: DevOps
+    tools: Docker, Docker Compose, Kubernetes, Helm, GitHub Actions, Jenkins, Git, Grafana, Loki
+  - name: Testing and practices
+    tools: pytest, factory-boy, mypy, black, flake8, isort, test-driven development, code review, Agile/Scrum
+  - name: Architecture and security
+    tools: REST API design, OpenAPI/Swagger, microservices, task queues, caching, RBAC, JWT, SOPS + age, Stripe payments

@@ -4,12 +4,12 @@ role: Backend Engineer
 tagline: I build the parts of a web product you don't see, and keep them running.
 lead: >-
   User accounts, payments, search, background jobs and the servers
-  underneath. For **3+ years** I've built them in Python, with Django and
+  underneath. For **4+ years** I've built them in Python, with Django and
   Flask, for products used by thousands of people, including a tutoring
   marketplace I founded.
 availability: Open to a new role or project
 seoTitle: Burak Üren | Backend Engineer in Istanbul (Python, Django)
-seoDescription: Backend engineer in Istanbul with 3+ years of building REST APIs, payments, background jobs and the servers under them in Python, Django and Flask.
+seoDescription: Backend engineer in Istanbul with 4+ years of building REST APIs, payments, background jobs and the servers under them in Python, Django and Flask.
 services:
   - flag: --build
     title: Build your backend
@@ -18,11 +18,11 @@ services:
   - flag: --tune
     title: Make it faster and cheaper
     body: 'Find what is slow or expensive and fix it: caching, query tuning, leaner servers and smaller deploys.'
-    proof: Cut BanaDersBul's hosting bill from **$180** to **$40** a month by moving off Kubernetes.
+    proof: Cut BanaDersBul's hosting bill by **78%** by moving off Kubernetes.
   - flag: --keep-it-running
     title: Ship it and keep it running
     body: Automated tests and deploys, logs and alerts, so problems get caught before your users notice them.
-    proof: Logging and alerts at SMGrader that turned failure triage from **hours into minutes**.
+    proof: Logging and alerts at SMGrader that halved failure triage, from **~1 h** to **~30 min**.
 about:
   - >-
     I got into backend work by building my own product. In 2021 I launched
@@ -41,15 +41,16 @@ facts:
   - label: Based in
     value: Istanbul, Turkey
   - label: Experience
-    value: '**3+ years** professional, building since 2021'
+    value: '**4+ years** professional, building since 2021'
   - label: Education
     value: B.Sc. Mathematics and Computer Science
     sub: >-
-      Istanbul Kültür University, 2022 to 2026. Mentored student coders at
-      Patika.dev, ran Linux community events, Erasmus+ BIP with EU partner
-      universities.
+      Istanbul Kültür University, 2022 to 2026 (graduated). Mentored student
+      coders at Patika.dev, ran Linux community events, Erasmus+ Blended
+      Intensive Programme with EU partner universities, guest article on
+      Teclado (2022).
   - label: Languages
-    value: Turkish (native), English (professional)
+    value: Turkish (native), English (professional working proficiency)
   - label: How I work
     value: Agile and Scrum teams, test-driven, peer code review
 location:
