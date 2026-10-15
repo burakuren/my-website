@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { postHost, type Post } from '../lib/posts';
+
+/** A post published on another site: the whole card links out, in a new tab. */
+interface Props {
+  post: Post;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { post, headingLevel: H = 'h3' } = Astro.props;
+const { title, description, tags, externalUrl, publisher } = post.data;
+const host = postHost(post);
+---
+
+<article class="ext-card">
+  <div class="ext-card-top">
+    <span class="ext-badge">Guest post</span>
+    <span class="ext-site">{host}</span>
+    <span class="ext-go" aria-hidden="true"><Icon name="i-external" /></span>
+  </div>
+  <H>
+    <a href={externalUrl} target="_blank" rel="noopener">{title}<span class="visually-hidden"> (guest post on {publisher ?? host}, opens in a new tab)</span></a>
+  </H>
+  <p>{description}</p>
+  {tags.length > 0 && <div class="post-row-meta">{tags.map((t) => <span class="tag">{t}</span>)}</div>}
+</article>

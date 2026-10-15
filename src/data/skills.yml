@@ -1,27 +1,15 @@
-comment: what I reach for
 groups:
-  - name: backend
-    items:
-      - key: languages
-        value: python, sql
-      - key: frameworks
-        value: django, drf, flask, sqlalchemy, celery, htmx
-      - key: data
-        value: postgresql, redis, rabbitmq, pandas
-      - key: concepts
-        value: rest apis, microservices, caching, rbac, jwt/oauth, stripe
-  - name: ops
-    items:
-      - key: infra
-        value: docker, kubernetes, aws, digitalocean
-      - key: web
-        value: caddy, nginx
-      - key: delivery
-        value: github actions, jenkins
-      - key: observability
-        value: grafana, loki
-      - key: quality
-        value: pytest, factory-boy, mypy, black, flake8
-      - key: os
-        value: linux
-        comment: daily driver
+  - name: Languages
+    tools: Python, SQL, Bash
+  - name: Frameworks
+    tools: Django, Django REST Framework, Flask, SQLAlchemy, Celery, HTMX
+  - name: Data
+    tools: PostgreSQL, Redis, RabbitMQ, pandas
+  - name: Cloud and servers
+    tools: AWS (RDS, S3, EKS, ElastiCache), DigitalOcean, Docker, Docker Compose, Kubernetes, Caddy, Nginx, Cloudflare, Linux
+  - name: Testing and delivery
+    tools: pytest, factory-boy, GitHub Actions, Jenkins, SOPS + age, mypy, black, flake8, isort
+  - name: Monitoring
+    tools: Grafana, Loki
+  - name: Concepts
+    tools: REST API design, OpenAPI/Swagger, microservices, async task queues, caching, RBAC, JWT/OAuth, Stripe payments

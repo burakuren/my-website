@@ -36,6 +36,8 @@ const link = z.object({ label: z.string(), url: z.string() });
 const singleton = (path: string, id: string) =>
   file(path, { parser: (text) => [{ id, ...(parseYaml(text) as object) }] });
 
+// Text fields marked "bold" accept **double asterisks** around metrics
+// (rendered by src/lib/inline.ts); everything else is plain text.
 const profile = defineCollection({
   loader: singleton('src/data/profile.yml', 'profile'),
   schema: z.object({
@@ -43,34 +45,43 @@ const profile = defineCollection({
     handle: z.string(),
     role: z.string(),
     tagline: z.string(),
+    /** bold */
+    lead: z.string(),
+    availability: z.string().optional(),
     seoTitle: z.string(),
     seoDescription: z.string().max(170),
-    synopsis: z.array(z.object({ flag: z.string(), arg: z.string() })),
-    description: z.string(),
+    services: z
+      .array(
+        z.object({
+          flag: z.string(),
+          title: z.string(),
+          body: z.string(),
+          /** bold */
+          proof: z.string().optional(),
+        }),
+      )
+      .default([]),
     about: z.array(z.string()),
-    status: z.string(),
-    fetch: z.array(z.object({ key: z.string(), value: z.string() })),
+    facts: z
+      .array(
+        z.object({
+          label: z.string(),
+          /** bold */
+          value: z.string(),
+          sub: z.string().optional(),
+        }),
+      )
+      .default([]),
     location: z.object({ city: z.string(), country: z.string() }),
     email: z.email(),
-    contactHeadline: z.string(),
+    contactHeading: z.string(),
+    contactText: z.string().optional(),
+    /** bold: "**Lead** rest of the step." */
+    contactSteps: z.array(z.string()).default([]),
     social: z.array(link.extend({ key: z.string() })),
     resume: z.string().optional(),
     knowsAbout: z.array(z.string()).default([]),
     alumniOf: z.string().optional(),
-  }),
-});
-
-const projects = defineCollection({
-  loader: file('src/data/projects.yml', {
-    parser: (text) => (parseYaml(text) as { projects: { name: string }[] }).projects.map((p, i) => ({ id: `${String(i).padStart(2, '0')}-${p.name}`, order: i, ...p })),
-  }),
-  schema: z.object({
-    order: z.number(),
-    name: z.string(),
-    kind: z.enum(['dir', 'file']).default('dir'),
-    url: z.url().optional(),
-    description: z.string(),
-    tags: z.array(z.string()).default([]),
   }),
 });
 
@@ -83,27 +94,24 @@ const experience = defineCollection({
     role: z.string(),
     org: z.string(),
     url: z.url().optional(),
-    kind: z.enum(['work', 'education']).default('work'),
+    // Label beside the dates; "HEAD" marks the current job (green dot).
     ref: z.string().optional(),
     // "YYYY-MM"; end omitted means ongoing.
     start: z.string().regex(/^\d{4}-\d{2}$/),
     end: z.string().regex(/^\d{4}-\d{2}$/).optional(),
-    note: z.string().optional(),
+    summary: z.string(),
+    results: z.array(z.object({ value: z.string(), label: z.string() })).default([]),
+    /** bold; shown under "Technical details" */
     highlights: z.array(z.string()).default([]),
+    stack: z.array(z.string()).default([]),
   }),
 });
 
 const skills = defineCollection({
   loader: singleton('src/data/skills.yml', 'skills'),
   schema: z.object({
-    comment: z.string().optional(),
-    groups: z.array(
-      z.object({
-        name: z.string(),
-        items: z.array(z.object({ key: z.string(), value: z.string(), comment: z.string().optional() })),
-      }),
-    ),
+    groups: z.array(z.object({ name: z.string(), tools: z.string() })),
   }),
 });
 
-export const collections = { blog, profile, projects, experience, skills };
+export const collections = { blog, profile, experience, skills };

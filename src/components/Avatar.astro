@@ -7,11 +7,16 @@ interface Props {
   size: number;
   alt: string;
   eager?: boolean;
+  /** For an image whose size changes with the viewport: candidate widths plus
+   *  a `sizes` attribute, instead of 1x/2x of `size`. */
+  widths?: number[];
+  sizes?: string;
+  class?: string;
 }
 
-const { size, alt, eager = false } = Astro.props;
-// AVIF first, then WebP, with the original JPEG as the fallback <img>;
-// 1x and 2x of each so it stays sharp on high-density screens.
+const { size, alt, eager = false, widths, sizes, class: className } = Astro.props;
+// AVIF first, then WebP, with the original JPEG as the fallback <img>.
+const resolution = widths && sizes ? { widths, sizes } : { densities: [1, 2] };
 ---
 
 <Picture
@@ -19,11 +24,12 @@ const { size, alt, eager = false } = Astro.props;
   alt={alt}
   width={size}
   height={size}
-  densities={[1, 2]}
+  {...resolution}
   formats={['avif', 'webp']}
   fallbackFormat="jpg"
   quality={80}
   class="avatar"
+  pictureAttributes={className ? { class: className } : {}}
   loading={eager ? 'eager' : 'lazy'}
   fetchpriority={eager ? 'high' : 'auto'}
 />

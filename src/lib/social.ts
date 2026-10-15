@@ -1,5 +1,7 @@
+const SOCIAL_ICONS = { linkedin: 'si-linkedin', github: 'si-github' } as const;
+
 /** Sprite icon for a profile social link, by its `key`. */
-export const socialIcon = (key: string) => (key === 'linkedin' ? 'si-linkedin' : key === 'github' ? 'si-github' : undefined);
+export const socialIcon = (key: string) => SOCIAL_ICONS[key as keyof typeof SOCIAL_ICONS] as (typeof SOCIAL_ICONS)[keyof typeof SOCIAL_ICONS] | undefined;
 
 /** "Burak Üren" → "Burak_Uren_CV.pdf": the CV's download name. */
 export const cvFileName = (name: string) => `${name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_')}_CV.pdf`;
