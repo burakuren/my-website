@@ -441,47 +441,52 @@ main:focus { outline: none; }
   letter-spacing: -0.015em;
 }
 
-/* h2 + `#` link + "Link copied" status (SectionTitle.astro). Dimmed but
-   visible so touch screens can find it; full colour on hover/focus.
-   Inline, so the `#` follows the last word of a heading that wraps. */
-.section-head h2,
-.contact-title h2 { display: inline; }
-.section-anchor {
-  margin-left: 4px;
-  padding: 4px 8px;
-  font-family: var(--mono);
-  font-size: var(--fs-xl);
-  color: var(--muted);
-  text-decoration: none;
-  opacity: 0.5;
+/* Section heading + link icon at the right end of its row
+   (SectionTitle.astro). The icon box is one heading line tall, so it lines
+   up with the first line when a heading wraps; the -11px margin puts the
+   icon's right edge on the content edge. "Link copied" is a small pill
+   under the icon, so it never reflows the heading. */
+.section-head,
+.contact-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
 }
-.section-anchor:focus-visible { opacity: 1; color: var(--green); }
+.section-head h2,
+.contact-title h2 { flex: 1; min-width: 0; }
+.section-link {
+  position: relative;
+  flex: none;
+  margin-right: -11px;
+}
+.section-anchor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: calc(var(--fs-2xl) * 1.2);
+  color: var(--muted);
+}
+.section-anchor .ic { width: 18px; height: 18px; }
+.section-anchor:focus-visible,
+.section-anchor.is-copied { color: var(--green); }
 @media (hover: hover) {
-  .section-head:hover .section-anchor,
-  .contact-title:hover .section-anchor { opacity: 1; }
   .section-anchor:hover { color: var(--green); }
 }
-.anchor-status { font-size: var(--fs-sm); color: var(--muted); }
-
-/* In the two-column contact card an inline `#` pushed the heading onto a
-   second line, so there it sits in the card's left padding, on the first
-   line's baseline (the anchor is an h2-sized sans strut, the `#` inside it
-   is mono), with the status above the heading. */
-@media (min-width: 901px) {
-  .contact-title { position: relative; }
-  .contact-title .section-anchor {
-    position: absolute;
-    top: 0;
-    right: 100%;
-    margin: 0;
-    padding: 0 8px;
-    font-family: var(--sans);
-    font-size: var(--fs-2xl);
-    line-height: 1.2;
-  }
-  .contact-title .section-anchor span { font-family: var(--mono); font-size: var(--fs-xl); }
-  .contact-title .anchor-status { position: absolute; left: 0; bottom: 100%; margin-bottom: 4px; }
+.anchor-status {
+  position: absolute;
+  top: 100%;
+  right: 4px;
+  z-index: 1;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  font-size: var(--fs-sm);
+  color: var(--text);
+  white-space: nowrap;
 }
+.anchor-status:empty { opacity: 0; pointer-events: none; }
 
 /* ---------- Services ---------- */
 
