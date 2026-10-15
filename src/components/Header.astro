@@ -33,7 +33,11 @@ const profile = (await getEntry('profile', 'profile'))!.data;
         })
       }
       <a class="icon-link" href="/rss.xml" aria-label="RSS feed" title="RSS feed"><Icon name="si-rss" /></a>
-      {profile.resume && <a class="btn btn-sm nav-cv" href={profile.resume} download={CV_FILENAME}>Download CV</a>}
+      {profile.resume && <a class="btn btn-sm nav-cv" href={profile.resume} download={CV_FILENAME} aria-label="Download CV">
+          <Icon name="i-download" />
+          <span class="nav-cv-long" aria-hidden="true">Download CV</span>
+          <span class="nav-cv-short" aria-hidden="true">CV</span>
+        </a>}
     </nav>
   </div>
 </header>

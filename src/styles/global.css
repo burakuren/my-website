@@ -238,9 +238,10 @@ main:focus { outline: none; }
   position: sticky;
   top: 0;
   z-index: 20;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* Opaque on purpose: a see-through header picked up the tint of whatever
+     scrolled under it, and mobile browsers that colour their toolbars from
+     the page (Safari 26, Chrome Android) flickered between shades. */
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 
@@ -283,7 +284,9 @@ main:focus { outline: none; }
   color: var(--muted);
 }
 .icon-link .ic { width: 18px; height: 18px; }
-.nav-cv { margin-left: 8px; }
+.nav-cv { margin-left: 8px; gap: 6px; }
+.nav-cv .ic { width: 16px; height: 16px; }
+.nav-cv-short { display: none; }
 .nav-link[aria-current='page'] {
   color: var(--strong);
   text-decoration: underline;
@@ -307,7 +310,18 @@ main:focus { outline: none; }
 
 @media (max-width: 520px) {
   .brand-prompt { display: none; }
-  .nav-cv { display: none; }
+  .header-row { gap: 12px; }
+  .brand-name { white-space: nowrap; }
+  .site-nav { gap: 0; }
+  .nav-link { padding: 8px 10px; }
+  .icon-link { width: 36px; }
+  /* The CV stays reachable on phones as a compact "CV" button */
+  .nav-cv { margin-left: 4px; padding: 0 10px; }
+  .nav-cv-long { display: none; }
+  .nav-cv-short { display: inline; }
+}
+@media (max-width: 359px) {
+  .nav-cv-short { display: none; }
 }
 
 /* ---------- Hero ---------- */
