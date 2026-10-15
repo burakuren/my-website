@@ -1,57 +1,142 @@
-// Renders the social card (public/og.png) and the app icons from SVG.
-// Run with `npm run images` after changing name/role. Needs JetBrains Mono
-// installed locally (any "JetBrains Mono" or "JetBrainsMono Nerd Font").
+// Renders the social card (public/og.png) and the app icons.
+// Run with `npm run images` after changing the name, role or tagline.
+//
+// The card is the v2 design's og/og.html filled from profile.yml and
+// screenshotted by headless Chromium at 1200x630 (fonts load from Google
+// Fonts, so this needs a network connection). The icons are SVG rendered
+// by sharp.
 import sharp from 'sharp';
-import { readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { parse } from 'yaml';
 
 const profile = parse(await readFile(new URL('../src/data/profile.yml', import.meta.url), 'utf8'));
 const out = (p) => new URL(`../public/${p}`, import.meta.url).pathname;
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const mono = "'JetBrains Mono', 'JetBrainsMono Nerd Font Mono', 'JetBrainsMono Nerd Font', monospace";
-const c = { bg: '#15171c', panel: '#1b1e25', line: '#2b3038', text: '#d7dae0', muted: '#9198a4', green: '#97c58e', amber: '#e2b466', blue: '#90b4da', dot: '#2a2f39' };
+const c = { bg: '#15171c', green: '#97c58e' };
+// Bottom strip of the card; kept short (cards are cached for a long time).
+const STACK = 'python django flask postgresql';
 
-// Circular photo on the right, framed like the fetch card on the home page.
-const PHOTO = { x: 860, y: 150, size: 260 };
-const photoPng = await sharp(new URL('../src/assets/burak.jpg', import.meta.url).pathname)
-  .resize(PHOTO.size, PHOTO.size)
-  .composite([{ input: Buffer.from(`<svg width="${PHOTO.size}" height="${PHOTO.size}"><circle cx="${PHOTO.size / 2}" cy="${PHOTO.size / 2}" r="${PHOTO.size / 2}"/></svg>`), blend: 'dest-in' }])
-  .png()
-  .toBuffer();
+const photo = await sharp(new URL('../src/assets/burak.jpg', import.meta.url).pathname).resize(640, 640).jpeg({ quality: 88 }).toBuffer();
 
-const flags = profile.synopsis
-  .map((s) => `<tspan fill="${c.text}"> [</tspan><tspan fill="${c.amber}">${esc(s.flag)}</tspan><tspan fill="${c.text}"> ${esc(s.arg)}]</tspan>`)
-  .join('');
+const ogHtml = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500;700&display=block" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #15171c;
+      --panel: #1b1e25;
+      --line: #2b3038;
+      --text: #d7dae0;
+      --muted: #9198a4;
+      --strong: #f2f3f5;
+      --green: #97c58e;
+      --amber: #e2b466;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+    body {
+      -webkit-font-smoothing: antialiased;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: var(--text);
+    }
+    .card {
+      position: relative;
+      width: 1200px;
+      height: 630px;
+      padding: 64px 80px 0;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 64px;
+    }
+    .prompt {
+      grid-column: 1 / -1;
+      font: 500 24px/1 'JetBrains Mono', monospace;
+      color: var(--muted);
+    }
+    .prompt b { color: var(--green); font-weight: 500; margin-right: 14px; }
+    .copy { align-self: center; }
+    .name {
+      font: 700 96px/1.02 'JetBrains Mono', monospace;
+      letter-spacing: -0.03em;
+      color: var(--strong);
+    }
+    .role {
+      margin-top: 14px;
+      font-size: 40px;
+      font-weight: 500;
+      color: var(--green);
+      letter-spacing: -0.005em;
+    }
+    .tagline {
+      margin-top: 36px;
+      font-size: 32px;
+      line-height: 1.35;
+      color: var(--text);
+      max-width: 19em;
+    }
+    .photo {
+      align-self: center;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      border: 3px solid var(--line);
+      object-fit: cover;
+    }
+    /* Bottom strip: the site's terminal, reduced to one line */
+    .strip {
+      grid-column: 1 / -1;
+      margin: 0 -80px;
+      padding: 0 80px;
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+      font: 400 24px/1 'JetBrains Mono', monospace;
+    }
+    .stack { color: var(--amber); word-spacing: 0.4em; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="prompt"><b>~ ❯</b>burakuren.com</p>
+    <div class="copy">
+      <p class="name">${esc(profile.name)}</p>
+      <p class="role">${esc(profile.role)}</p>
+      <p class="tagline">${esc(profile.tagline)}</p>
+    </div>
+    <img class="photo" src="data:image/jpeg;base64,${photo.toString('base64')}" alt="">
+    <div class="strip">
+      <span class="stack">${esc(STACK)}</span>
+    </div>
+  </div>
+</body>
+</html>`;
 
-const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="1.3" fill="${c.dot}"/></pattern>
-    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0.5" stop-color="${c.bg}" stop-opacity="0"/><stop offset="1" stop-color="${c.bg}"/></linearGradient>
-  </defs>
-  <rect width="1200" height="630" fill="${c.bg}"/>
-  <rect width="1200" height="630" fill="url(#dots)"/>
-  <rect width="1200" height="630" fill="url(#fade)"/>
-  <rect x="0" y="0" width="1200" height="64" fill="${c.panel}"/>
-  <rect x="0" y="64" width="1200" height="1" fill="${c.line}"/>
-  <text x="64" y="41" font-family="${mono}" font-size="22" font-weight="500"><tspan fill="${c.green}">burak@burakuren</tspan><tspan fill="${c.muted}">:</tspan><tspan fill="${c.blue}">~</tspan><tspan fill="${c.muted}">$</tspan></text>
-  <rect x="308" y="22" width="11" height="24" fill="${c.green}"/>
-  <text x="64" y="136" font-family="${mono}" font-size="18" fill="${c.muted}">UREN(1)</text>
-  <text x="64" y="196" font-family="${mono}" font-size="20" font-weight="700" fill="${c.text}" letter-spacing="1.6">NAME</text>
-  <text x="96" y="290" font-family="${mono}" font-size="84" font-weight="700" fill="${c.text}" letter-spacing="-2.5">${esc(profile.name)}</text>
-  <rect x="${96 + profile.name.length * 48.5}" y="222" width="8" height="78" fill="${c.green}"/>
-  <text x="96" y="344" font-family="${mono}" font-size="28" fill="${c.muted}">- ${esc(profile.tagline)}</text>
-  <text x="64" y="420" font-family="${mono}" font-size="20" font-weight="700" fill="${c.text}" letter-spacing="1.6">SYNOPSIS</text>
-  <text x="96" y="466" font-family="${mono}" font-size="24" xml:space="preserve"><tspan fill="${c.text}" font-weight="700">burak</tspan>${flags}</text>
-  <text x="64" y="574" font-family="${mono}" font-size="22" fill="${c.green}">burakuren.com</text>
-  <text x="1136" y="574" font-family="${mono}" font-size="20" fill="${c.muted}" text-anchor="end">python · django · devops · linux</text>
-  <circle cx="${PHOTO.x + PHOTO.size / 2}" cy="${PHOTO.y + PHOTO.size / 2}" r="${PHOTO.size / 2 + 3}" fill="${c.line}"/>
-  <text x="${PHOTO.x + PHOTO.size / 2}" y="${PHOTO.y + PHOTO.size + 40}" font-family="${mono}" font-size="18" fill="${c.muted}" text-anchor="middle">~/burak.jpg</text>
-</svg>`;
-
-await sharp(Buffer.from(og))
-  .composite([{ input: photoPng, left: PHOTO.x, top: PHOTO.y }])
-  .png({ compressionLevel: 9 })
-  .toFile(out('og.png'));
+const dir = await mkdtemp(join(tmpdir(), 'og-'));
+try {
+  await writeFile(join(dir, 'og.html'), ogHtml);
+  execFileSync(process.env.CHROMIUM ?? 'chromium', [
+    '--headless=new',
+    '--no-sandbox',
+    '--hide-scrollbars',
+    '--force-device-scale-factor=1',
+    '--window-size=1200,630',
+    '--virtual-time-budget=10000',
+    `--screenshot=${join(dir, 'og.png')}`,
+    `file://${join(dir, 'og.html')}`,
+  ], { stdio: 'ignore' });
+  await sharp(join(dir, 'og.png')).resize(1200, 630, { fit: 'cover', position: 'top' }).png({ compressionLevel: 9 }).toFile(out('og.png'));
+} finally {
+  await rm(dir, { recursive: true, force: true });
+}
 
 const icon = (size, radius) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="${radius}" fill="${c.bg}"/>
