@@ -1,2 +1,11 @@
 # Old CV URL from the first deploy.
 /resume.pdf /cv.pdf 301
+
+# Bear Blog feeds and sitemap from before the move, so feed readers and
+# crawlers that still request them land on the current files.
+/feed/ /rss.xml 301
+/feed /rss.xml 301
+/atom.xml /rss.xml 301
+/feed.xml /rss.xml 301
+/index.xml /rss.xml 301
+/sitemap.xml /sitemap-index.xml 301
