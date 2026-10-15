@@ -11,13 +11,17 @@ export async function GET(context: APIContext) {
     description: 'Notes from building and running systems: backend, infrastructure and Linux.',
     site: context.site!,
     trailingSlash: true,
+    // dc:creator names the author without publishing an email address
+    // (RSS <author> must be one).
+    xmlns: { dc: 'http://purl.org/dc/elements/1.1/' },
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
+      // Guest posts link to the site that published them.
       link: postUrl(post),
       categories: post.data.tags,
-      author: `${profile.email} (${profile.name})`,
+      customData: `<dc:creator>${profile.name}</dc:creator>`,
     })),
     customData: '<language>en</language>',
   });

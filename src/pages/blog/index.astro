@@ -2,7 +2,7 @@
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ManLine from '../../components/ManLine.astro';
-import { getPosts, postUrl } from '../../lib/posts';
+import { getPosts, isExternal, postUrl } from '../../lib/posts';
 import { isoDate, readingMinutes } from '../../lib/format';
 import { SITE_URL } from '../../site.config.mjs';
 
@@ -34,7 +34,7 @@ const jsonLd = [
     description,
     inLanguage: 'en',
     author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: profile.name, url: `${SITE_URL}/` },
-    blogPost: posts.map((p) => ({
+    blogPost: posts.filter((p) => !isExternal(p)).map((p) => ({
       '@type': 'BlogPosting',
       headline: p.data.title,
       url: `${SITE_URL}${postUrl(p)}`,

@@ -20,6 +20,9 @@ const blog = defineCollection({
       cover: image().optional(),
       coverAlt: z.string().optional(),
       draft: z.boolean().default(false),
+      // Guest posts published elsewhere: no body, no local page; lists link out.
+      externalUrl: z.url().optional(),
+      publisher: z.string().optional(),
     }),
 });
 

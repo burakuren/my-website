@@ -12,6 +12,7 @@ import { HEAD_INIT } from './src/lib/head-init.mjs';
 
 // The blog index is `noindex` until the first post is published, so keep it
 // out of the sitemap too (Search Console flags noindex URLs in sitemaps).
+// Guest posts (body-less entries with `externalUrl`) count as published.
 const hasPublishedPosts = readdirSync('./src/content/blog', { withFileTypes: true }).some((d) => {
   const file = `./src/content/blog/${d.name}/index.md`;
   return d.isDirectory() && existsSync(file) && !/^draft:\s*true\s*$/m.test(readFileSync(file, 'utf8').split(/^---\s*$/m)[1] ?? '');

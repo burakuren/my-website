@@ -4,13 +4,14 @@ import { getEntry, render } from 'astro:content';
 import { getImage, Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Avatar from '../../components/Avatar.astro';
-import { getPosts, postUrl, type Post } from '../../lib/posts';
+import { getPosts, localPosts, postUrl, type Post } from '../../lib/posts';
 import { isoDate, readingMinutes } from '../../lib/format';
 import { SITE_URL } from '../../site.config.mjs';
 
 export const getStaticPaths = (async () => {
-  const posts = await getPosts();
-  // Posts are sorted newest first: the "older" post is the next one in the list.
+  // Guest posts live elsewhere and get no page. Posts are sorted newest
+  // first: the "older" post is the next one in the list.
+  const posts = localPosts(await getPosts());
   return posts.map((post, i) => ({
     params: { slug: post.id },
     props: { post, older: posts[i + 1], newer: posts[i - 1] },

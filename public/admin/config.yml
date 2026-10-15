@@ -89,7 +89,7 @@ collections:
         widget: select
         multiple: true
         required: false
-        options: [backend, devops, linux, python, django, databases, notes]
+        options: [backend, devops, linux, python, django, databases, algorithms, notes]
         hint: Add new tags to this list in public/admin/config.yml.
       - name: cover
         label: Cover image
@@ -105,9 +105,20 @@ collections:
         widget: boolean
         default: true
         hint: Drafts are only visible in local development.
+      - name: externalUrl
+        label: Guest post URL
+        widget: string
+        required: false
+        hint: 'For a post published on another site: its full URL. Leave the body empty; lists link out and no page is built here.'
+      - name: publisher
+        label: Guest post publisher
+        widget: string
+        required: false
+        hint: Name of the site that published it, e.g. Teclado.
       - name: body
         label: Body
         widget: markdown
+        required: false
         hint: 'Code fences take a title: ```ini title="api.socket". Callouts: > [!NOTE]. Image captions come from the image title.'
 
 singletons:
