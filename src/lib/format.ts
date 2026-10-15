@@ -5,11 +5,6 @@ export function dateLabel(d: Date): string {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
- /** 2026-09-14 (v1 blog pages; removed once they are restyled). */
-export function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
 /** "2026-03" → "Mar 2026" */
 export function monthLabel(ym: string): string {
   const [y, m] = ym.split('-').map(Number);

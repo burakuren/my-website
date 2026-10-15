@@ -5,7 +5,9 @@ import { getImage, Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Avatar from '../../components/Avatar.astro';
 import { getPosts, localPosts, postUrl, type Post } from '../../lib/posts';
-import { isoDate, readingMinutes } from '../../lib/format';
+import Icon from '../../components/Icon.astro';
+import { dateLabel, readingMinutes } from '../../lib/format';
+import { socialIcon } from '../../lib/social';
 import { SITE_URL } from '../../site.config.mjs';
 
 export const getStaticPaths = (async () => {
@@ -33,10 +35,12 @@ const toc = headings.filter((h) => h.depth === 2);
 const minutes = readingMinutes(post.body ?? '');
 const modified = updatedDate ?? pubDate;
 const url = `${SITE_URL}${postUrl(post)}`;
-const github = profile.social.find((s) => s.key === 'github');
+const socialLinks = profile.social.flatMap((s) => {
+  const icon = socialIcon(s.key);
+  return icon ? [{ ...s, icon }] : [];
+});
 
 const og = cover ? await getImage({ src: cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 82 }) : undefined;
-const mistakeMail = `mailto:${profile.email}?subject=${encodeURIComponent(`Re: ${title}`)}`;
 
 const jsonLd = [
   {
@@ -80,108 +84,130 @@ const jsonLd = [
   noindex={post.data.draft}
   jsonLd={jsonLd}
 >
-  <main id="main" class="wrap" tabindex="-1">
-    <nav class="post-crumbs" aria-label="Breadcrumb">
-      <a href="/blog/">← cd ../blog</a>
-      <span aria-hidden="true">~/blog/{post.id}.md</span>
+  <main id="main" class="wrap post-grid" tabindex="-1">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog/">Blog</a></li>
+        <li><span aria-current="page">{title}</span></li>
+      </ol>
     </nav>
 
     <header class="post-header">
-      <div class="post-header-meta">
-        <time datetime={pubDate.toISOString()}>{isoDate(pubDate)}</time><span aria-hidden="true">·</span><span>{minutes} min read</span>
-        {tags.length > 0 && <span aria-hidden="true">·</span>}
-        {tags.map((t) => <a class="tag" href={`/blog/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
-        {post.data.draft && <span class="c-amber">(draft, not published)</span>}
+      <div class="post-meta">
+        <time datetime={pubDate.toISOString()}>{dateLabel(pubDate)}</time>
+        <span><strong>{minutes}</strong> min read</span>
+        {
+          tags.length > 0 && (
+            <span class="tags">
+              {tags.map((t) => (
+                <a class="tag" href={`/blog/?tag=${encodeURIComponent(t)}`}>
+                  {t}
+                </a>
+              ))}
+            </span>
+          )
+        }
+        {post.data.draft && <span class="badge-draft">Draft</span>}
       </div>
       <h1 id="post-title">{title}</h1>
-      <p class="lede">{description}</p>
+      <p class="dek">{description}</p>
       {
         cover && (
           <figure class="post-cover">
-            <Image src={cover} alt={coverAlt ?? ''} widths={[720, 1120, 1600]} sizes="(min-width: 1184px) 860px, calc(100vw - 32px)" loading="eager" fetchpriority="high" />
+            <Image src={cover} alt={coverAlt ?? ''} widths={[720, 1120, 1440]} sizes="(min-width: 800px) 720px, calc(100vw - 32px)" loading="eager" fetchpriority="high" />
           </figure>
         )
       }
     </header>
 
-    <div class="post-layout">
-      {
-        toc.length > 1 && (
-          <nav class="toc" aria-labelledby="toc-title">
-            <h2 id="toc-title">CONTENTS</h2>
-            <ol>
-              {toc.map((h, i) => (
+    {
+      toc.length > 1 && (
+        <details class="toc" open>
+          <summary>On this page</summary>
+          <ol>
+            {toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      )
+    }
+
+    <article class="post-body" aria-labelledby="post-title">
+      <div class="prose">
+        <Content />
+      </div>
+
+      <div class="post-foot">
+        <span>Last updated <time datetime={modified.toISOString()}>{dateLabel(modified)}</time></span>
+        <a href="/#contact" data-mailto data-subject={`Re: ${title}`}>Found a mistake? Email me</a>
+      </div>
+
+      <section class="author" aria-label="About the author">
+        <Avatar size={96} alt="" />
+        <div>
+          <p class="author-name">{profile.name}</p>
+          <p class="author-role">{profile.role}</p>
+          <p class="author-bio">I write about things I've built, broken and fixed: APIs, infrastructure and Linux.</p>
+          <ul class="link-row" role="list">
+            {
+              socialLinks.map((s) => (
                 <li>
-                  <a href={`#${h.slug}`}>
-                    <span>{i + 1}</span>
-                    {h.text}
+                  <a href={s.url} rel="me noopener">
+                    <Icon name={s.icon} />
+                    {s.label}
                   </a>
                 </li>
-              ))}
-            </ol>
-          </nav>
-        )
-      }
-
-      <article class="post-body" aria-labelledby="post-title">
-        <div class="prose">
-          <Content />
+              ))
+            }
+            <li>
+              <a href="/rss.xml"><Icon name="si-rss" />RSS</a>
+            </li>
+            <li>
+              <a href="/#about"><Icon name="i-user" />About me</a>
+            </li>
+          </ul>
         </div>
+      </section>
 
-        <div class="post-foot">
-          <span>last modified <time datetime={modified.toISOString()}>{isoDate(modified)}</time></span>
-          <a href={mistakeMail}>found a mistake? → mail me</a>
-        </div>
-
-        <section class="author" aria-label="About the author">
-          <Avatar size={96} alt={`Photo of ${profile.name}`} />
-          <div class="author-copy">
-            <div class="author-cmd" aria-hidden="true">$ whoami</div>
-            <p class="author-name">{profile.name}</p>
-            <p>{profile.role} working across backend, devops and Linux. I write here about things I've built, broken and fixed.</p>
-            <div class="author-links">
-              <a href="/#about">~/about</a>
-              <a href="/rss.xml">rss.xml</a>
-              {github && <a href={github.url} rel="me noopener">github</a>}
+      <nav class="pager" aria-label="More posts">
+        {
+          older ? (
+            <a href={postUrl(older)} rel="prev">
+              <small>Older post</small>
+              <strong>{older.data.title}</strong>
+            </a>
+          ) : (
+            <div class="none">
+              <small>Older post</small>
+              <strong>This is the first post.</strong>
             </div>
-          </div>
-        </section>
-
-        <nav class="pager" aria-label="More posts">
-          {
-            older ? (
-              <a href={postUrl(older)} rel="prev">
-                <small>← git log HEAD~1</small>
-                <strong>{older.data.title}</strong>
-              </a>
-            ) : (
-              <div class="none">
-                <small>← older</small>
-                <strong>This is the first post. git log stops here.</strong>
-              </div>
-            )
-          }
-          {
-            newer ? (
-              <a href={postUrl(newer)} rel="next" class="next">
-                <small>newer →</small>
-                <strong>{newer.data.title}</strong>
-              </a>
-            ) : (
-              <div class="none next">
-                <small>newer →</small>
-                <strong>You're at HEAD: this is the latest post.</strong>
-              </div>
-            )
-          }
-        </nav>
-      </article>
-    </div>
+          )
+        }
+        {
+          newer ? (
+            <a href={postUrl(newer)} rel="next" class="next">
+              <small>Newer post</small>
+              <strong>{newer.data.title}</strong>
+            </a>
+          ) : (
+            <div class="none next">
+              <small>Newer post</small>
+              <strong>This is the latest post.</strong>
+            </div>
+          )
+        }
+      </nav>
+    </article>
   </main>
 </Base>
 
 <script>
-  // Reveal the copy buttons rendered by the Shiki transformer and wire them up.
+  // Code copy buttons ship hidden (shiki-code-header.mjs); reveal and wire
+  // them when the Clipboard API exists.
   if (navigator.clipboard) {
     document.querySelectorAll<HTMLButtonElement>('.code-copy').forEach((button) => {
       button.hidden = false;
@@ -190,17 +216,62 @@ const jsonLd = [
         const code = button.closest('.code-block')?.querySelector('pre code')?.textContent ?? '';
         try {
           await navigator.clipboard.writeText(code);
-          button.textContent = 'copied ✓';
+          button.textContent = 'Copied';
           button.classList.add('is-copied');
         } catch {
-          button.textContent = 'copy failed';
+          button.textContent = 'Copy failed';
         }
         clearTimeout(timer);
         timer = window.setTimeout(() => {
-          button.textContent = 'copy';
+          button.textContent = 'Copy';
           button.classList.remove('is-copied');
         }, 1600);
       });
     });
+  }
+
+  // "On this page": an always-open sticky rail at >=1080px; below that a
+  // disclosure that starts closed and closes again after a link is chosen.
+  const toc = document.querySelector<HTMLDetailsElement>('.toc');
+  if (toc) {
+    const desktop = matchMedia('(min-width: 1080px)');
+    const summary = toc.querySelector('summary')!;
+    const sync = () => {
+      toc.open = desktop.matches;
+      summary.tabIndex = desktop.matches ? -1 : 0;
+    };
+    sync();
+    desktop.addEventListener('change', sync);
+    toc.addEventListener('toggle', () => {
+      if (desktop.matches && !toc.open) toc.open = true;
+    });
+    toc.addEventListener('click', (e) => {
+      if (!desktop.matches && (e.target as Element).closest('a')) toc.open = false;
+    });
+
+    // The current section is the last heading that has scrolled past the
+    // sticky header.
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a')];
+    const headings = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
+    let ticking = false;
+    const markCurrent = () => {
+      ticking = false;
+      let current = -1;
+      headings.forEach((h, i) => {
+        if (h && h.getBoundingClientRect().top < 120) current = i;
+      });
+      links.forEach((a, i) => a.setAttribute('aria-current', String(i === current)));
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(markCurrent);
+        }
+      },
+      { passive: true },
+    );
+    markCurrent();
   }
 </script>

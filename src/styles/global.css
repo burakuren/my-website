@@ -1131,6 +1131,8 @@ a.tag:focus-visible { outline-offset: 2px; }
   letter-spacing: -0.025em;
   line-height: 1.12;
 }
+.post-cover { margin: 32px 0 0; }
+.post-cover img { width: 100%; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .post-header .dek {
   margin-top: 16px;
   font-size: var(--fs-lg);
@@ -1200,6 +1202,7 @@ a.tag:focus-visible { outline-offset: 2px; }
   text-decoration: none;
   opacity: 0;
 }
+.prose .heading-anchor::before { content: '#'; }
 .prose h2:hover .heading-anchor,
 .prose .heading-anchor:focus-visible { opacity: 1; }
 
@@ -1256,6 +1259,8 @@ a.tag:focus-visible { outline-offset: 2px; }
   font-size: var(--fs-sm);
   font-weight: 600;
 }
+.prose .callout-title-icon { display: flex; padding-top: 3px; }
+.prose .callout-title-icon svg { width: 16px; height: 16px; }
 .prose .callout-content > * { margin: 0; }
 .prose .callout-content > * + * { margin-top: 12px; }
 .prose .callout :not(pre) > code { background: var(--bg); }
@@ -1433,6 +1438,21 @@ a.tag:focus-visible { outline-offset: 2px; }
   .author .avatar { width: 72px; height: 72px; }
   .pager { grid-template-columns: minmax(0, 1fr); }
   .pager .next { text-align: left; }
+}
+
+/* ---------- 404 ---------- */
+
+.not-found { padding-top: 96px; max-width: 56ch; }
+.not-found-code { color: var(--amber); font-size: var(--fs-sm); }
+.not-found h1 {
+  margin-top: 8px;
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.not-found > p:not(.not-found-code) { margin-top: 16px; color: var(--muted); font-size: var(--fs-lg); }
+@media (max-width: 760px) {
+  .not-found { padding-top: 48px; }
 }
 
 @media print {

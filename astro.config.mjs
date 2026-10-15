@@ -5,6 +5,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import satteriCallouts from 'satteri-callouts';
 import { codeBlockHeader } from './src/lib/shiki-code-header.mjs';
 import { figureFromTitle } from './src/lib/satteri-figure.mjs';
+import { proseExtras } from './src/lib/satteri-prose.mjs';
 import { SITE_URL } from './src/site.config.mjs';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -17,6 +18,10 @@ const hasPublishedPosts = readdirSync('./src/content/blog', { withFileTypes: tru
   const file = `./src/content/blog/${d.name}/index.md`;
   return d.isDirectory() && existsSync(file) && !/^draft:\s*true\s*$/m.test(readFileSync(file, 'utf8').split(/^---\s*$/m)[1] ?? '');
 });
+
+const INFO_ICON =
+  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
+const calloutIcons = Object.fromEntries(['note', 'tip', 'important', 'warning', 'caution'].map((t) => [t, { indicator: INFO_ICON }]));
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -81,8 +86,9 @@ export default defineConfig({
   ],
   markdown: {
     processor: satteri({
-      // `> [!NOTE]` style callouts, styled in global.css.
-      hastPlugins: [satteriCallouts({ theme: 'github', showIndicator: false }), figureFromTitle()],
+      // `> [!NOTE]` style callouts, styled in global.css; every type gets the
+      // same stroke info icon. Then figures, heading anchors, table wrappers.
+      hastPlugins: [satteriCallouts({ theme: 'github', callouts: calloutIcons }), figureFromTitle(), proseExtras()],
     }),
     syntaxHighlight: 'shiki',
     shikiConfig: {

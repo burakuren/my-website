@@ -44,7 +44,7 @@ export function codeBlockHeader() {
                   type: 'element',
                   tagName: 'button',
                   properties: { type: 'button', className: ['code-copy'], hidden: true },
-                  children: [{ type: 'text', value: 'copy' }],
+                  children: [{ type: 'text', value: 'Copy' }],
                 },
               ],
             },
