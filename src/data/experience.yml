@@ -13,8 +13,8 @@ entries:
         label: people using it
       - value: 50+
         label: referrals tracked end to end
-      - value: End to end
-        label: data model, API, tests and deploys, built by me
+      - value: Every release
+        label: checked by an automated test suite before it ships
     highlights:
       - Django and PostgreSQL; multi-level referrer network and an ordered outreach pipeline with enforced stage transitions.
       - Test-first in Scrum iterations; pytest and factory-boy suite guards every release.
