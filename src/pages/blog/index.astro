@@ -1,9 +1,10 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import ManLine from '../../components/ManLine.astro';
+import GuestCard from '../../components/GuestCard.astro';
+import Icon from '../../components/Icon.astro';
 import { getPosts, isExternal, postUrl } from '../../lib/posts';
-import { isoDate, readingMinutes } from '../../lib/format';
+import { dateLabel, readingMinutes } from '../../lib/format';
 import { SITE_URL } from '../../site.config.mjs';
 
 const profile = (await getEntry('profile', 'profile'))!.data;
@@ -34,91 +35,113 @@ const jsonLd = [
     description,
     inLanguage: 'en',
     author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: profile.name, url: `${SITE_URL}/` },
-    blogPost: posts.filter((p) => !isExternal(p)).map((p) => ({
-      '@type': 'BlogPosting',
-      headline: p.data.title,
-      url: `${SITE_URL}${postUrl(p)}`,
-      datePublished: p.data.pubDate.toISOString(),
-    })),
+    blogPost: posts
+      .filter((p) => !isExternal(p))
+      .map((p) => ({
+        '@type': 'BlogPosting',
+        headline: p.data.title,
+        url: `${SITE_URL}${postUrl(p)}`,
+        datePublished: p.data.pubDate.toISOString(),
+      })),
   },
 ];
 ---
 
 <Base title={title} description={description} section="blog" noindex={posts.length === 0} jsonLd={jsonLd}>
   <main id="main" class="wrap" tabindex="-1">
-    <ManLine page="BLOG(7)" title="Miscellaneous Information" />
-
-    <section class="page-intro" aria-labelledby="blog-title">
-      <div class="page-intro-copy">
-        <p class="label" aria-hidden="true">NAME</p>
-        <h1 class="page-title indent" id="blog-title">Writing</h1>
-        <p class="page-lede indent">Notes from building and running systems: backend, infrastructure and Linux. What worked, what broke, and why.</p>
-      </div>
-      <a class="rss-link" href="/rss.xml"><span class="c-amber">rss</span><span class="muted">/rss.xml</span></a>
-    </section>
-
-    {
-      posts.length > 0 && (
-        <section class="filters" aria-label="Filter posts" data-filters hidden>
-          <label class="search">
-            <span class="c-green" aria-hidden="true">❯</span>
-            <span class="muted" aria-hidden="true">grep -i</span>
-            <input type="search" placeholder="search posts…" aria-label="Search posts" autocomplete="off" spellcheck="false" data-query />
-          </label>
-          {tags.length > 0 && (
-            <div class="tag-filter" role="group" aria-label="Filter by tag">
-              <button type="button" aria-pressed="true" data-tag="all">all <span class="count">{posts.length}</span></button>
-              {tags.map(([t, n]) => (
-                <button type="button" aria-pressed="false" data-tag={t}>
-                  {t} <span class="count">{n}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-      )
-    }
-
-    <div class="post-total" aria-live="polite"><span data-total>total {posts.length}</span></div>
+    <div class="page-head">
+      <h1 id="blog-title">Blog</h1>
+      <a class="rss-link" href="/rss.xml"><Icon name="si-rss" />RSS feed</a>
+    </div>
 
     {
       posts.length === 0 ? (
-        <div class="empty">
-          <p><span class="muted">ls:</span> no posts yet; the first one is being written.</p>
-          <p class="muted">Subscribe to <a href="/rss.xml" class="c-green">rss.xml</a> to get it when it lands.</p>
+        <div class="list-state">
+          <h2>No posts yet</h2>
+          <p>The first one is being written. Subscribe to the RSS feed to get it when it's published.</p>
+          <a class="btn" href="/rss.xml">
+            <Icon name="si-rss" />
+            Subscribe via RSS
+          </a>
         </div>
       ) : (
         <>
-          <div class="post-groups" data-groups>
+          {/* Progressive enhancement: hidden until JS runs; the full list is in the HTML. */}
+          <section class="filters" aria-label="Filter posts" data-filters hidden>
+            <label class="search">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <input type="search" placeholder="Search posts" aria-label="Search posts" autocomplete="off" spellcheck="false" data-query />
+            </label>
+            {tags.length > 0 && (
+              <div class="tag-filter" role="group" aria-label="Filter by tag">
+                <button type="button" aria-pressed="true" data-tag="all">
+                  all <span class="count">{posts.length}</span>
+                </button>
+                {tags.map(([t, n]) => (
+                  <button type="button" aria-pressed="false" data-tag={t}>
+                    {t} <span class="count">{n}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <p class="post-total" aria-live="polite" data-total>
+            {posts.length === 1 ? '1 post' : `${posts.length} posts`}
+          </p>
+
+          <div data-groups>
             {groups.map((g) => (
-              <section aria-labelledby={`y${g.year}`} data-group>
-                <h2 class="post-year" id={`y${g.year}`}>{g.year}</h2>
+              <section class="year-group" aria-labelledby={`y${g.year}`} data-group>
+                <h2 id={`y${g.year}`}>{g.year}</h2>
                 <ul class="post-list" role="list">
                   {g.posts.map((p) => (
-                    <li class="post-item" data-post data-tags={p.data.tags.join(' ')} data-text={`${p.data.title} ${p.data.description} ${p.data.tags.join(' ')}`.toLowerCase()}>
-                      <div class="post-meta">
-                        <time datetime={p.data.pubDate.toISOString()}>{isoDate(p.data.pubDate)}</time>
-                        {p === posts[0] && <span class="head">(HEAD)</span>}
-                        {p.data.draft && <span class="head">(draft)</span>}
-                      </div>
-                      <div class="post-main">
-                        <h3><a href={postUrl(p)}>{p.data.title}</a></h3>
-                        <p>{p.data.description}</p>
-                        <div class="post-tags">
-                          {p.data.tags.map((t) => <span class="tag">{t}</span>)}
-                          <span class="mins">{readingMinutes(p.body ?? '')} min read</span>
+                    <li
+                      class:list={['post-row', { 'is-external': isExternal(p) }]}
+                      data-post
+                      data-tags={p.data.tags.join(' ')}
+                      data-text={`${p.data.title} ${p.data.description} ${p.data.publisher ?? ''} ${p.data.tags.join(' ')}`.toLowerCase()}
+                    >
+                      <p class="post-row-date">
+                        <time datetime={p.data.pubDate.toISOString()}>{dateLabel(p.data.pubDate)}</time>
+                      </p>
+                      {isExternal(p) ? (
+                        <GuestCard post={p} />
+                      ) : (
+                        <div>
+                          <h3>
+                            <a href={postUrl(p)}>{p.data.title}</a>
+                          </h3>
+                          <p>{p.data.description}</p>
+                          <div class="post-row-meta">
+                            {p.data.tags.map((t) => (
+                              <span class="tag">{t}</span>
+                            ))}
+                            <span class="mins">
+                              <strong>{readingMinutes(p.body ?? '')}</strong> min read
+                            </span>
+                            {p.data.draft && <span class="badge-draft">Draft</span>}
+                          </div>
                         </div>
-                      </div>
-                      <a class="post-cat" href={postUrl(p)} tabindex="-1" aria-hidden="true">cat →</a>
+                      )}
                     </li>
                   ))}
                 </ul>
               </section>
             ))}
           </div>
-          <div class="empty" data-no-results hidden>
-            <p><span class="muted">grep:</span> no posts match <span class="c-amber" data-echo></span></p>
-            <button type="button" data-clear>clear filters</button>
+
+          <div class="list-state" data-no-results hidden>
+            <h2>
+              No posts match <span data-echo />
+            </h2>
+            <p>Try a shorter search, or clear the filters to see every post.</p>
+            <button type="button" class="btn" data-clear>
+              Clear filters
+            </button>
           </div>
         </>
       )
@@ -127,7 +150,8 @@ const jsonLd = [
 </Base>
 
 <script>
-  // Progressive enhancement: the full list is server-rendered; this only hides rows.
+  // Progressive enhancement: the full list is server-rendered; this only hides
+  // rows. Filter state is mirrored in ?q= and ?tag=.
   const filters = document.querySelector<HTMLElement>('[data-filters]');
   if (filters) {
     filters.hidden = false;
@@ -143,7 +167,7 @@ const jsonLd = [
 
     const params = new URLSearchParams(location.search);
     if (params.get('q')) input.value = params.get('q')!;
-    if (params.get('tag') && tagButtons.some((b) => b.dataset.tag === params.get('tag'))) tag = params.get('tag')!;
+    if (tagButtons.some((b) => b.dataset.tag === params.get('tag'))) tag = params.get('tag')!;
 
     function apply() {
       const q = input.value.trim().toLowerCase();
@@ -155,10 +179,10 @@ const jsonLd = [
       }
       for (const g of groups) g.hidden = !g.querySelector('[data-post]:not([hidden])');
       tagButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tag === tag)));
-      total.textContent = `total ${shown}`;
+      total.textContent = shown === 1 ? '1 post' : `${shown} posts`;
       groupsWrap.hidden = shown === 0;
       noResults.hidden = shown !== 0;
-      echo.textContent = q ? `"${q}"` : tag !== 'all' ? `--tag ${tag}` : '';
+      echo.textContent = q ? `“${q}”` : `the tag “${tag}”`;
 
       const url = new URL(location.href);
       q ? url.searchParams.set('q', q) : url.searchParams.delete('q');
