@@ -51,12 +51,12 @@ location:
 email: contact@burakuren.com
 contactHeadline: Have a system that needs building, or one that keeps paging you at 3am? Let's talk.
 social:
-  - key: github
-    label: github.com/burakuren
-    url: https://github.com/burakuren
   - key: linkedin
-    label: linkedin.com/in/burakuren
+    label: LinkedIn
     url: https://www.linkedin.com/in/burakuren/
+  - key: github
+    label: GitHub
+    url: https://github.com/burakuren
 resume: /cv.pdf
 knowsAbout:
   - Python

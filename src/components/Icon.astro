@@ -1,0 +1,9 @@
+---
+/** A symbol from IconSprite.astro, sized and coloured by CSS (`.ic`). */
+interface Props {
+  name: 'si-github' | 'si-linkedin' | 'si-rss' | 'i-download' | 'i-external' | 'i-user';
+}
+const { name } = Astro.props;
+---
+
+<svg class="ic" aria-hidden="true"><use href={`#${name}`} /></svg>

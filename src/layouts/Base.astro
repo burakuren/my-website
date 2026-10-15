@@ -4,7 +4,7 @@ import { getEntry } from 'astro:content';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import BackToTop from '../components/BackToTop.astro';
+import IconSprite from '../components/IconSprite.astro';
 import { SITE_NAME } from '../site.config.mjs';
 import { HEAD_INIT } from '../lib/head-init.mjs';
 
@@ -13,10 +13,6 @@ interface Props {
   description: string;
   /** Which nav item is the current page. */
   section?: 'home' | 'blog' | 'none';
-  /** Path shown in the header prompt, e.g. "~/blog". */
-  cwd?: string;
-  /** Right-hand label in the footer, e.g. "UREN(1)". */
-  manPage?: string;
   ogImage?: string;
   ogImageAlt?: string;
   ogType?: 'website' | 'article' | 'profile';
@@ -29,10 +25,8 @@ const {
   title,
   description,
   section = 'none',
-  cwd = '~',
-  manPage = 'UREN(1)',
   ogImage = '/og.png',
-  ogImageAlt = `${SITE_NAME}: backend software engineer`,
+  ogImageAlt,
   ogType = 'website',
   article,
   noindex = false,
@@ -43,6 +37,9 @@ const profile = (await getEntry('profile', 'profile'))!.data;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const social = Object.fromEntries(profile.social.map((s) => [s.key, s.url]));
+const ogAlt = ogImageAlt ?? `${SITE_NAME}: ${profile.role}`;
+// Read by src/lib/mailto.ts; keeps the address out of the markup and hrefs.
+const mailData = Buffer.from(profile.email).toString('base64');
 ---
 
 <!doctype html>
@@ -75,7 +72,7 @@ const social = Object.fromEntries(profile.social.map((s) => [s.key, s.url]));
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image:alt" content={ogAlt} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     {ogType === 'profile' && <meta property="profile:first_name" content={profile.name.split(' ')[0]} />}
@@ -89,18 +86,22 @@ const social = Object.fromEntries(profile.social.map((s) => [s.key, s.url]));
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
-    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <meta name="twitter:image:alt" content={ogAlt} />
 
     <Font cssVariable="--font-sans" preload={[{ weight: 400, style: 'normal', subset: 'latin' }]} />
     <Font cssVariable="--font-mono" preload={[{ weight: 700, style: 'normal', subset: 'latin' }, { weight: 400, style: 'normal', subset: 'latin' }]} />
 
     {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />)}
   </head>
-  <body>
-    <a class="skip-link" href="#main">Skip to content</a>
-    <Header section={section} cwd={cwd} />
+  <body data-m={mailData}>
+    <IconSprite />
+    <a class="skip" href="#main">Skip to content</a>
+    <Header section={section} />
     <slot />
-    <Footer name={profile.name} manPage={manPage} />
-    <BackToTop />
+    <Footer name={profile.name} />
   </body>
 </html>
+
+<script>
+  import '../lib/mailto';
+</script>

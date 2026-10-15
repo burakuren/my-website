@@ -3,7 +3,7 @@ const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)');
 /** Scroll to the very top and hand keyboard focus back to the header prompt. */
 export function scrollToTop() {
   // Focus first: moving focus mid-way would cancel the smooth scroll.
-  document.querySelector<HTMLElement>('.site-header .prompt')?.focus({ preventScroll: true });
+  document.querySelector<HTMLElement>('.site-header .brand')?.focus({ preventScroll: true });
   window.scrollTo({ top: 0, behavior: smooth.matches ? 'smooth' : 'auto' });
 
   // Mobile browser toolbars sliding in can cut a smooth scroll short; finish

@@ -1,34 +1,38 @@
 ---
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { cvFileName, socialIcon } from '../lib/social';
+
 interface Props {
   section: 'home' | 'blog' | 'none';
-  cwd: string;
 }
 
-const { section, cwd } = Astro.props;
-// On the home page the section links are in-page anchors.
-const base = section === 'home' ? '' : '/';
-const links = [
-  { href: `${base}#about`, label: './about' },
-  { href: `${base}#projects`, label: './projects' },
-  { href: `${base}#experience`, label: './experience' },
-  { href: '/blog/', label: './blog', current: section === 'blog' },
-  { href: `${base}#contact`, label: './contact' },
-];
+const { section } = Astro.props;
+const profile = (await getEntry('profile', 'profile'))!.data;
 ---
 
 <header class="site-header">
-  <div class="wrap">
-    <a href="/" class="prompt" {...(section === 'home' ? { 'aria-current': 'page' } : {})}>
-      <span class="c-green">burak@burakuren</span><span class="muted">:</span><span class="c-blue">{cwd}</span><span class="muted">$</span><span class="cursor" aria-hidden="true"></span><span class="visually-hidden"> (home)</span>
+  <div class="wrap header-row">
+    <a class="brand" href="/" {...(section === 'home' ? { 'aria-current': 'page', 'aria-label': `${profile.name}, back to top` } : {})}>
+      <span class="brand-prompt" aria-hidden="true">~ ❯</span>
+      <span class="brand-name">{profile.name}</span>
     </a>
-    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-        <path class="open" d="M4 7h16M4 12h16M4 17h16" /><path class="close" d="M6 6l12 12M18 6 6 18" />
-      </svg>
-      <span>menu</span>
-    </button>
-    <nav class="site-nav" id="site-nav" aria-label="Main">
-      {links.map((l) => <a href={l.href} {...(l.current ? { 'aria-current': 'page' } : {})}>{l.label}</a>)}
+    <nav class="site-nav" aria-label="Main">
+      <a class="nav-link" href="/blog/" {...(section === 'blog' ? { 'aria-current': 'page' } : {})}>Blog</a>
+      {
+        profile.social.map((s) => {
+          const icon = socialIcon(s.key);
+          return (
+            icon && (
+              <a class="icon-link" href={s.url} rel="me noopener" aria-label={s.label} title={s.label}>
+                <Icon name={icon} />
+              </a>
+            )
+          );
+        })
+      }
+      <a class="icon-link" href="/rss.xml" aria-label="RSS feed" title="RSS feed"><Icon name="si-rss" /></a>
+      {profile.resume && <a class="btn btn-sm nav-cv" href={profile.resume} download={cvFileName(profile.name)}>Download CV</a>}
     </nav>
   </div>
 </header>
@@ -36,33 +40,11 @@ const links = [
 <script>
   import { scrollToTop } from '../lib/scroll-top';
 
-  // Small screens collapse the nav behind a toggle; without JS it stays visible.
-  const header = document.querySelector<HTMLElement>('.site-header')!;
-  const toggle = header.querySelector<HTMLButtonElement>('.nav-toggle')!;
-
-  function setOpen(open: boolean) {
-    toggle.setAttribute('aria-expanded', String(open));
-    header.classList.toggle('is-open', open);
-  }
-
-  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
-  header.querySelectorAll('.site-nav a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-  // On the home page the prompt is "cd ~": scroll up instead of reloading.
-  // (Phones rely on this; the floating back-to-top button is desktop only.)
-  header.querySelector('.prompt')!.addEventListener('click', (e) => {
+  // On the home page the name scrolls back up instead of reloading.
+  document.querySelector('.site-header .brand')!.addEventListener('click', (e) => {
     if (location.pathname !== '/') return;
     e.preventDefault();
-    setOpen(false);
     if (location.hash) history.replaceState(null, '', '/');
     scrollToTop();
-  });
-  document.addEventListener('click', (e) => {
-    if (!header.contains(e.target as Node)) setOpen(false);
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && header.classList.contains('is-open')) {
-      setOpen(false);
-      toggle.focus();
-    }
   });
 </script>

@@ -1,13 +1,15 @@
 ---
+import { SOURCE_URL } from '../site.config.mjs';
+
 interface Props {
   name: string;
-  manPage: string;
 }
-const { name, manPage } = Astro.props;
+const { name } = Astro.props;
 ---
 
 <footer class="site-footer">
-  <div class="wrap">
-    <span>{name}</span><span>{new Date().getFullYear()}</span><span>{manPage}</span>
+  <div class="wrap footer-row">
+    <p>© {new Date().getFullYear()} {name}</p>
+    <p>Built with Astro, served from Cloudflare. <a href={SOURCE_URL} rel="noopener">Source on GitHub</a></p>
   </div>
 </footer>
